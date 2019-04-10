@@ -1,0 +1,12 @@
+[filter "kicad_project"]
+        clean = sed -E 's/^update=.*$/update=Date/'
+        smudge = cat
+[filter "kicad_sch"]
+        clean = "sed -E 's/#(PWR|FLG)[0-9]+/#\\1?/'"
+        smudge = cat
+
+
+#Global
+[diff "image"]
+        command = ~/bin/git-imgdiff
+

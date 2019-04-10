@@ -1,0 +1,75 @@
+Plan of action:
+	Update symmetric 60 to pull makefile from new repo
+	create our own dockerfile
+	write docker wrapper that generates a PDF schematic for fab output
+	update makefile to use docker wrapper that generates schematic for fab output
+	write docker wrapper that generates our BOM for fab output	
+	update makefile to use docker wrapper that generates BOM for fab output
+	update makefile to use
+
+	update dockerfile to push iBOM into docker
+	write docker wrapper that generates iBOM for fab output
+	update makefile to use
+	
+	update dockerfile to push kiplot into docker
+	write docker wrapper to do kiplotting for fab output
+	update makefile to use
+	
+	document git practices (smudging and modding to reduce churn)
+
+	document how to diff two schematic revs from commandline as an image
+
+	write helper to diff schematic revs as an image
+
+	document how to diff two layout revs from commandline as an image
+	
+	write helper to diff two layout revs as an image
+
+	Automate ERC?
+
+	Figure out how to automate KiCAD STEP exports
+	write docker wrapper to do step export
+	update makefile to do step export
+
+
+	KiCost?
+
+	figure out how to run ERC and get report 
+	write docker wrapper to do erc
+	update makefile to do erc
+
+
+	figure out how to run DRC and get report 
+	write docker wrapper to do drc
+	update makefile to do drc
+		
+
+
+	
+
+Maybe include:
+
+https://github.com/vslavik/diff-pdf
+
+
+
+Output breaks when there's no tag in the history:
+
+fatal: No names found, cannot describe anything.
+perl ../bin/generate-bom atreus out/atreus-`git describe`/bom
+
+
+BOM
+iBOM
+Schematic
+Layout
+Diff
+STP?
+Package for seeed
+Package for oshpark?
+Git config
+
+
+docker notes:
+
+docker run -it -v "$(pwd)":/test_container: kicad-automation bash

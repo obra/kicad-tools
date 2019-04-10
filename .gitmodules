@@ -1,0 +1,9 @@
+[submodule "upstream/InteractiveHtmlBom"]
+	path = upstream/InteractiveHtmlBom
+	url = https://github.com/openscopeproject/InteractiveHtmlBom
+[submodule "upstream/kicad-automation-scripts"]
+	path = upstream/kicad-automation-scripts
+	url = https://github.com/productize/kicad-automation-scripts
+[submodule "upstream/kiplot"]
+	path = upstream/kiplot
+	url = https://github.com/johnbeard/kiplot

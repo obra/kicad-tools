@@ -1,0 +1,36 @@
+$ git config --global filter.kicad_project.clean "sed -E 's/^update=.*$/update=Date/'"
+$ git config --global filter.kicad_project.smudge cat
+
+$ git config --global filter.kicad_sch.clean sed -E "'s/#(PWR|FLG)[0-9]+/#\1?/'"
+$ git config --global filter.kicad_sch.smudge cat
+
+
+docs -  from https://jnavila.github.io/plotkicadsch/
+
+
+removing the date in the .pro file
+
+A particular one is the fact that the project file contains a field that represents the date of last modification of the project, for example, when a lib is added to the project. I don’t know where this date is supposed to appear, but the changes in this field are quite disruptive for version control.
+
+First, let’s define the filter kicad_project for the *.pro files. We do so by adding a .gitattributes file at the root of working copy, with the following content:
+
+*.pro filter=kicad_project
+After that, we define the filters and we want them to be available for all the projects where the attribute is defined, so we define it at the user config level. The clean part of the filter (for checkin) will get rid of the date, while the smudge part of the filter (checkout) will do nothing.
+
+Doing nothing is just passing the content through the cat command. On the other hand, the actual filtering in the clean part needs a little more work. Basically, we apply a stream edition, via the sed command:
+
+$ git config --global filter.kicad_project.clean "sed -E 's/^update=.*$/update=Date/'"
+$ git config --global filter.kicad_project.smudge cat
+The --global option makes the filter available any every project where the attribute is defined for project files. From now on, changes to date in the project file won’t be noticed by git.
+
+Power and Flags Numbering
+
+Another annoying behavior in Kicad Schematics is the way the power and flag parts are numbered. These components are part of the schematic but they don’t appear in the BOM. So, their numbering is all managed internally by Kicad. Kicad renumbers them all everytime the user requests an annotation of the project, which modifies all those references in all the sheets each time. This feature is only really needed when generating the netlists (only for internal purpose), so it’s better keeping the references for all theses phantom parts to “unknown” in the revision control system. Let’s kick off another filter for that! First let’s add a new attribute in the .gitattributes file:
+
+*.sch filter=kicad_sch
+Then let’s clean up all the sch files before staging:
+
+$ git config --global filter.kicad_sch.clean sed -E 's/#(PWR|FLG)[0-9]+/#\1?/'"
+$ git config --global filter.kicad_sch.smudge cat
+With this one, you should be able to diff your project and get a more understandable view of your changes.
+
