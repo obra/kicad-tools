@@ -34,13 +34,12 @@ interactive-bom: dirs
 
 
 bom: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom export /kicad-project/$(BOARD)/$(BOARD).sch /output/bom/
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(BOARD)/$(BOARD).sch --output_dir /output/bom/ export
 
 schematic-pdf: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic export --all_pages  -f pdf /kicad-project/$(BOARD)/$(BOARD).sch /output/schematic/pdf
-
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(BOARD)/$(BOARD).sch --output_dir /output/schematic/pdf export --all_pages  -f pdf 
 schematic-svg: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic export --all_pages  -f svg /kicad-project/$(BOARD)/$(BOARD).sch /output/schematic/svg
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(BOARD)/$(BOARD).sch --output_dir /output/schematic/pdf export --all_pages  -f svg
 
 docker-shell:
 	$(DOCKER_RUN) bash
