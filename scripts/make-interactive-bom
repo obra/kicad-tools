@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Start Xvfb
+Xvfb :99 -ac -nolisten tcp &
+xvfb=$!
+
+export DISPLAY=:99
+
+python3 /opt/InteractiveHtmlBom/InteractiveHtmlBom/generate_interactive_bom.py $@ --highlight-pin1 --no-browser --dest-dir=/output
