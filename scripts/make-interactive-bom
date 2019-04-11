@@ -6,4 +6,4 @@ xvfb=$!
 
 export DISPLAY=:99
 
-python3 /opt/InteractiveHtmlBom/InteractiveHtmlBom/generate_interactive_bom.py $@ --highlight-pin1 --no-browser --dest-dir=/output
+python3 /opt/InteractiveHtmlBom/InteractiveHtmlBom/generate_interactive_bom.py $@ --highlight-pin1 --no-browser --dest-dir=/output/bom/interactive

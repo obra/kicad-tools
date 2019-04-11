@@ -33,23 +33,16 @@ RUN apt-get -y update && \
     pip install -r requirements.txt && \
     rm requirements.txt
 
+RUN apt-get -y remove python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+
 # Use a UTF-8 compatible LANG because KiCad 5 uses UTF-8 in the PCBNew title
 # This causes a "failure in conversion from UTF8_STRING to ANSI_X3.4-1968" when
 # attempting to look for the window name with xdotool.
 ENV LANG C.UTF-8
 
 COPY upstream/kicad-automation-scripts /usr/lib/python2.7/dist-packages/kicad-automation
-
-COPY upstream/InteractiveHtmlBom /opt/InteractiveHtmlBom
-
-COPY upstream/kiplot /opt/src/kiplot
-
-COPY scripts/make-interactive-bom /opt/InteractiveHtmlBom/
-
-RUN cd /opt/src/kiplot && pip install -e . 
-
-RUN apt-get -y remove python-pip && \
-    rm -rf /var/lib/apt/lists/*
 
 # Copy default configuration and fp_lib_table to prevent first run dialog
 COPY upstream/kicad-automation-scripts/config/* /root/.config/kicad/
@@ -59,3 +52,26 @@ COPY upstream/kicad-automation-scripts/config/* /root/.config/kicad/
 RUN cp /usr/share/kicad/template/sym-lib-table /root/.config/kicad/
 RUN cp /usr/share/kicad/template/fp-lib-table /root/.config/kicad/
 
+
+
+# Install KiPlot
+
+# Kicad's libraries are tied to python3, so we need to install kiplot with
+# python 3
+RUN apt-get -y update && \
+    apt-get install -y python3-pip
+
+COPY upstream/kiplot /opt/kiplot
+
+RUN cd /opt/kiplot && pip3 install -e . 
+
+COPY etc/kiplot /opt/etc/kiplot
+
+# Install the interactive BOM
+
+COPY upstream/InteractiveHtmlBom /opt/InteractiveHtmlBom
+COPY scripts/make-interactive-bom /opt/InteractiveHtmlBom/
+
+
+RUN apt-get -y remove python3-pip && \
+    rm -rf /var/lib/apt/lists/*

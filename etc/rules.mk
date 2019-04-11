@@ -1,5 +1,8 @@
 ROOT_DIR := $(shell pwd)/..
 OUTPUT_DIR := $(shell pwd)/out/$(BOARD)-`git describe`
+
+DOCKER_RUN :=  sudo docker run --rm --interactive --tty  --volume $(ROOT_DIR):/kicad-project:   --volume $(OUTPUT_DIR):/output: kicad-automation
+
 all: 
 	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
 
@@ -14,7 +17,7 @@ archive:
 	cd out && zip -r $(BOARD)-`git describe`.zip $(BOARD)-`git describe`
 
 gerbers: dirs
-	kiplot -b $(BOARD).kicad_pcb  -c ../etc/generic_plot.kiplot.yaml -d out/$(BOARD)-`git describe`
+	$(DOCKER_RUN) kiplot -b /kicad-project/$(BOARD)/$(BOARD).kicad_pcb  -c /opt/etc/kiplot/generic_plot.kiplot.yaml -v -d /output/
 
 dirs:
 	mkdir -p $(OUTPUT_DIR)
@@ -25,23 +28,19 @@ dirs:
 schematic: schematic-svg schematic-pdf
 
 
-schematic-svg-docker: dirs
-
-
-schematic-svg: dirs
-	perl ../bin/plot-schematic $(BOARD) svg out/$(BOARD)-`git describe`/schematic/svg
-
-schematic-pdf: dirs
-	perl ../bin/plot-schematic $(BOARD) pdf out/$(BOARD)-`git describe`/schematic/pdf
-
-bom: dirs
-	perl ../bin/generate-bom $(BOARD) out/$(BOARD)-`git describe`/bom
 
 interactive-bom: dirs
-	sudo docker run --rm --interactive --tty  --volume $(ROOT_DIR):/kicad-project --volume $(OUTPUT_DIR)/bom/interactive:/output: kicad-automation sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD)/$(BOARD).kicad_pcb
+	$(DOCKER_RUN) sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD)/$(BOARD).kicad_pcb
 
-schematic-pdf-docker:
-	sudo docker run --rm --interactive --tty --volume $(ROOT_DIR):/kicad-project: --volume $(OUTPUT_DIR)/schematic/pdf:/output: kicad-automation python -m kicad-automation.eeschema.schematic export --all_pages  -f pdf /kicad-project/$(BOARD)/$(BOARD).sch /output/
 
-schematic-svg-docker:
-	sudo docker run --rm --interactive --tty --volume $(ROOT_DIR):/kicad-project: --volume $(OUTPUT_DIR)/schematic/svg:/output: kicad-automation python -m kicad-automation.eeschema.schematic export --all_pages  -f svg /kicad-project/$(BOARD)/$(BOARD).sch /output/
+bom: dirs
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom export /kicad-project/$(BOARD)/$(BOARD).sch /output/bom/
+
+schematic-pdf: dirs
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic export --all_pages  -f pdf /kicad-project/$(BOARD)/$(BOARD).sch /output/schematic/pdf
+
+schematic-svg: dirs
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic export --all_pages  -f svg /kicad-project/$(BOARD)/$(BOARD).sch /output/schematic/svg
+
+docker-shell:
+	$(DOCKER_RUN) bash
