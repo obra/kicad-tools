@@ -3,9 +3,11 @@ Heavily borrowed from this location: https://github.com/blairbonnett-mirrors/kic
 
 Parameters
 
-Takes 2 parameters
+Takes 3 parameters
 1. Path to kicad file
-2. Location of where to save pdfs
+2. Location of where to save files
+3  Plot format. can be either 'svg' or 'pdf'
+
 
     A python script example to create various plot files from a board:
     Fab files
@@ -31,7 +33,7 @@ Usage
     There are 4 main lines that generate a file. e.g..
 
     pctl.SetLayer(F_SilkS)
-    pctl.OpenPlotfile("Silk", PLOT_FORMAT_PDF, "Assembly guide")
+    pctl.OpenPlotfile("Silk", plot_format, "Assembly guide")
     pctl.PlotLayer()
     pctl.ClosePlot()
 
@@ -64,7 +66,11 @@ popt = pctl.GetPlotOptions()
 # popt.SetOutputDirectory("plot/")
 popt.SetOutputDirectory(sys.argv[2])
 
-
+if sys.argv[3] == 'svg': 
+	plot_format = PLOT_FORMAT_SVG
+else:
+	plot_format= PLOT_FORMAT_PDF
+	
 
 # Set some important plot options:
 popt.SetPlotFrameRef(False)
@@ -77,13 +83,13 @@ popt.SetUseGerberAttributes(True)
 popt.SetExcludeEdgeLayer(False);
 popt.SetScale(1)
 popt.SetUseAuxOrigin(True)
+popt.SetSkipPlotNPTH_Pads(False)
+popt.SetPlotViaOnMaskLayer(True)
+popt.SetSubtractMaskFromSilk(True)
+#popt.SetMode(LINE)
 
 # This by gerbers only (also the name is truly horrid!)
 popt.SetSubtractMaskFromSilk(False)
-
-pctl.SetLayer(F_SilkS)
-pctl.OpenPlotfile("Silk", PLOT_FORMAT_PDF, "Assembly guide")
-pctl.PlotLayer()
 
 #########################
 #### CuBottom.gbr    ####
@@ -104,170 +110,59 @@ pctl.PlotLayer()
 plot_plan = [
     ( "CuTop", F_Cu, "Top layer" ),
     ( "CuBottom", B_Cu, "Bottom layer" ),
+]
+
+bottom_layers = [
     ( "PasteBottom", B_Paste, "Paste Bottom" ),
+    ( "SilkBottom", B_SilkS, "Silk top" ),
+    ( "MaskBottom", B_Mask, "Mask bottom" ),
+    ( "CrtYdBottom", B_CrtYd, "CrtYd bottom" ),
+    ( "FabBottom", B_Fab, "Fab bottom" ),
+]
+
+top_layers = [
     ( "PasteTop", F_Paste, "Paste top" ),
     ( "SilkTop", F_SilkS, "Silk top" ),
-    ( "SilkBottom", B_SilkS, "Silk top" ),
     ( "MaskTop", F_Mask, "Mask top" ),
-    ( "MaskBottom", B_Mask, "Mask bottom" ),
-    ( "EdgeCuts", Edge_Cuts, "Edges" ),
+    ( "CrtYdTop", F_CrtYd, "CrtYd top" ),
+    ( "FabTop", F_Fab, "Fab top" ),
 ]
 
 for layer_info in plot_plan:
     pctl.SetLayer(layer_info[1])
-    pctl.OpenPlotfile(layer_info[0], PLOT_FORMAT_PDF, layer_info[2])
+    pctl.OpenPlotfile(layer_info[0], plot_format, layer_info[2])
+    pctl.PlotLayer()
+    pctl.SetLayer(Edge_Cuts)
     pctl.PlotLayer()
 
-######################
-#### AssyTop.pdf #####
-######################
 
-# Our fabricators want two additional gerbers:
-# An assembly with no silk trim and all and only the references
-# (you'll see that even holes have designators, obviously)
-popt.SetSubtractMaskFromSilk(False)
-popt.SetPlotReference(True)
-popt.SetPlotValue(False)
-popt.SetPlotInvisibleText(True)
 
-pctl.SetLayer(F_SilkS)
-pctl.OpenPlotfile("AssyTop", PLOT_FORMAT_PDF, "Assembly top")
-pctl.PlotLayer()
-
-###############################
-#### AssyOutlinesTop.pdf  #####
-###############################
-
-# And a gerber with only the component outlines (really!)
-popt.SetPlotReference(False)
-popt.SetPlotInvisibleText(False)
-pctl.SetLayer(F_SilkS)
-pctl.OpenPlotfile("AssyOutlinesTop", PLOT_FORMAT_PDF, "Assembly outline top")
-pctl.PlotLayer()
-
-######################
-#### Layout.pdf  #####
-######################
-
-# The same could be done for the bottom side, if there were components
-popt.SetUseAuxOrigin(False)
-
-## For documentation we also want a general layout PDF
-## I usually use a shell script to merge the ps files and then distill the result
-## Now I can do it with a control file. As a bonus I can have references in a
-## different colour, too.
-
+pctl.OpenPlotfile('Top', plot_format, 'Top side')
 popt.SetPlotReference(True)
 popt.SetPlotValue(True)
 popt.SetPlotInvisibleText(False)
-# Remember that the frame is always in color 0 (BLACK) and should be requested
-# before opening the plot
-popt.SetPlotFrameRef(False)
-pctl.SetLayer(Dwgs_User)
-
-pctl.OpenPlotfile("Layout", PLOT_FORMAT_PDF, "General layout")
-pctl.PlotLayer()
-
-# Do the PCB edges in yellow
-popt.SetColor(RED)
-pctl.SetLayer(Edge_Cuts)
-pctl.PlotLayer()
-
-## Comments in, uhmm... green
-popt.SetColor(GREEN)
-pctl.SetLayer(Cmts_User)
-pctl.PlotLayer()
-
-# Bottom mask as lines only, in red
-#popt.SetMode(LINE)
-popt.SetColor(RED)
-pctl.SetLayer(B_Mask)
-pctl.PlotLayer()
-
-# Top mask as lines only, in blue
-popt.SetColor(BLUE)
-pctl.SetLayer(F_Mask)
-pctl.PlotLayer()
-
-# Top paste in light blue, filled
-popt.SetColor(BLUE)
-#popt.SetMode(FILLED)
-pctl.SetLayer(F_Paste)
-pctl.PlotLayer()
-
-# Top Silk in cyan, filled, references in dark cyan
-popt.SetReferenceColor(DARKCYAN)
-popt.SetColor(CYAN)
-pctl.SetLayer(F_SilkS)
-pctl.PlotLayer()
-
-########################
-#### Assembly.svg  #####
-########################
-
-popt.SetTextMode(PLOTTEXTMODE_STROKE)
-pctl.SetLayer(F_Mask)
-pctl.OpenPlotfile("Assembly", PLOT_FORMAT_PDF, "Master Assembly")
-pctl.SetColorMode(True)
-
-# We want *everything*
-popt.SetPlotReference(True)
-popt.SetPlotValue(True)
-popt.SetPlotInvisibleText(True)
-
-# Remember than the DXF driver assigns colours to layers. This means that
-# we will be able to turn references on and off simply using their layers
-# Also most of the layer are now plotted in 'line' mode, because DXF handles
-# fill mode almost like sketch mode (this is to keep compatibility with
-# most CAD programs; most of the advanced primitive attributes required are
-# handled only by recent autocads...); also the entry level cads (qcad
-# and derivatives) simply don't handle polyline widths...
-# 
-# Here I'm using numbers for colors and layers, I'm too lazy too look them up:P
-popt.SetReferenceColor(19)
-popt.SetValueColor(21)
-
-popt.SetColor(0)
-#popt.SetMode(LINE)
-pctl.SetLayer(B_SilkS)
-pctl.PlotLayer()
-popt.SetColor(14)
-pctl.SetLayer(F_SilkS)
-pctl.PlotLayer()
-popt.SetColor(2)
-pctl.SetLayer(B_Mask)
-pctl.PlotLayer()
-popt.SetColor(4)
-pctl.SetLayer(F_Mask)
-pctl.PlotLayer()
-popt.SetColor(1)
-pctl.SetLayer(B_Paste)
-pctl.PlotLayer()
-popt.SetColor(9)
-pctl.SetLayer(F_Paste)
-pctl.PlotLayer()
-popt.SetColor(3)
-pctl.SetLayer(Edge_Cuts)
-pctl.PlotLayer()
-
-# Export the copper layers too... exporting one of them in filled mode with
-# drill marks will put the marks in the WHITE later (since it tries to blank
-# the pads...); these will be obviously great reference points for snap
-# and stuff in the cad. A pctl function to only plot them would be
-# better anyway...
-
-popt.SetColor(17)
-#popt.SetMode(FILLED)
 popt.SetDrillMarksType(PCB_PLOT_PARAMS.FULL_DRILL_SHAPE)
-pctl.SetLayer(B_Cu)
+for layer_info in top_layers:
+    pctl.SetLayer(layer_info[1])
+    pctl.PlotLayer()
+
+pctl.SetLayer(Edge_Cuts)
 pctl.PlotLayer()
-popt.SetColor(20)
-popt.SetDrillMarksType(PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
-pctl.SetLayer(F_Cu)
+
+
+pctl.OpenPlotfile('Bottom', plot_format, 'Bottom side')
+popt.SetPlotReference(True)
+popt.SetPlotValue(True)
+popt.SetPlotInvisibleText(False)
+popt.SetDrillMarksType(PCB_PLOT_PARAMS.FULL_DRILL_SHAPE)
+for layer_info in bottom_layers:
+    pctl.SetLayer(layer_info[1])
+    pctl.PlotLayer()
+pctl.SetLayer(Edge_Cuts)
 pctl.PlotLayer()
+
 
 # At the end you have to close the last plot, otherwise you don't know when
 # the object will be recycled!
 pctl.ClosePlot()
 
-# We have just generated 21 plotfiles with a single script
