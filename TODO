@@ -73,3 +73,9 @@ Git config
 docker notes:
 
 docker run -it -v "$(pwd)":/test_container: kicad-automation bash
+
+sudo docker run --rm --interactive --tty --volume $(pwd):/kicad-project: kicad-automation
+
+
+python -m kicad-automation.eeschema.schematic export --all_pages  -f pdf /kicad-project/symmetric60.sch /kicad-project/
+
