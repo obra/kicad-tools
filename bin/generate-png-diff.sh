@@ -4,7 +4,7 @@
 # If no refs specified, assumes HEAD
 
 OUTPUT_DIR="./plot"
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PLOT_BOARD_PATH=/opt/diff-boards/plot_board.py
 
 
 # Find .kicad_files that differ between commits
@@ -75,13 +75,13 @@ echo "Kicad files saved to:  '$OUTPUT_DIR/$DIFF_1' and '$OUTPUT_DIR/$DIFF_2'"
 mkdir -p /tmp/pdf/$DIFF_1
 for f in $OUTPUT_DIR/$DIFF_1/*.kicad_pcb; do
     echo "Converting $f to .pdf:  Files will be saved to /tmp/pdf"
-    python $SCRIPT_DIR/plot_board.py "$f" "/tmp/pdf/$DIFF_1"
+    python $PLOT_BOARD_PATH "$f" "/tmp/pdf/$DIFF_1"
 done
 
 mkdir -p /tmp/pdf/$DIFF_2
 for f in $OUTPUT_DIR/$DIFF_2/*.kicad_pcb; do
     echo "Converting $f to .pdf's Files will be saved to /tmp/pdf"
-    python $SCRIPT_DIR/plot_board.py "$f" "/tmp/pdf/$DIFF_2"
+    python $PLOT_BOARD_PATH "$f" "/tmp/pdf/$DIFF_2"
 done
 
 # Generate png diffs
