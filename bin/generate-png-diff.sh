@@ -93,4 +93,8 @@ echo "Output will be in $DIFF_DIR"
 find /tmp/pdf/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 /tmp/pdf/$DIFF_1/%.pdf /tmp/pdf/$DIFF_2/%.pdf $DIFF_DIR/%.png
 
 
+DIFF_FILES=$(ls -a $DIFF_DIR/*.png)
+
+montage -mode concatenate -tile 1x $(ls -a $DIFF_DIR/*.png) $DIFF_DIR/montage.png
+
 
