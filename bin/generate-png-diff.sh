@@ -4,7 +4,34 @@
 # If no refs specified, assumes HEAD
 
 OUTPUT_DIR="./plot"
-PLOT_BOARD_PATH=/opt/diff-boards/plot_board.py
+PLOT_BOARD_PATH=${PLOT_BOARD_PATH:-/opt/diff-boards/plot_board.py}
+PYTHON_PATH=${PYTHON_PATH:-python}
+
+CHECKOUT_ROOT=$(git rev-parse --show-toplevel)
+
+export_git_file_to_dir () {
+	file=$1
+	rev_id=$2
+	output=$3
+        mkdir -p "$output/$rev_id"
+        echo "Copying $output:$k to $output/$rev_id/"
+        git show "$rev_id:$k" > "$output/$rev_id/$(basename $k)"
+}
+
+
+board_to_pdf() {
+    rev_id=$1
+    input_dir=$2
+    output_dir=$3
+    
+    mkdir -p $output_dir/$DIFF_1
+    for f in $input_dir/$rev_id/*.kicad_pcb; do
+        echo "Converting $f to .pdf:  Files will be saved to $output_dir"
+        $PYTHON_PATH $PLOT_BOARD_PATH "$f" "$output_dir/$rev_id"
+    done
+
+
+}
 
 
 # Find .kicad_files that differ between commits
@@ -16,73 +43,44 @@ if [ $# -eq 0 ]; then
     DIFF_1="current"
     DIFF_2="$(git rev-parse --short HEAD)"
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
-    if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
-    # Copy all modified kicad_file to $OUTPUT_DIR/current
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_1"
-        cp "$k" $OUTPUT_DIR/current
-    done
-    # Copy the specified git commit kicad_file to $OUTPUT_DIR/$(git ref)
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_2"
-        echo "Copying $DIFF_2:$k to $OUTPUT_DIR/$DIFF_2/"
-        git show "$DIFF_2:$k" > "$OUTPUT_DIR/$DIFF_2/$(basename $k)"
-    done
-## User provided 1 git reference to compare against current files
 elif [ $# -eq 1 ]; then
     DIFF_1="current"
     DIFF_2="$1"
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
-    if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
-    # Copy all modified kicad_file to $OUTPUT_DIR/current
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_1"
-        cp "$k" $OUTPUT_DIR/current
-    done
-    # Copy the specified git commit kicad_file to $OUTPUT_DIR/$(git ref)
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_2"
-        echo "Copying $DIFF_2:$k to $OUTPUT_DIR/$DIFF_2/$k"
-        git show "$DIFF_2:$k" > "$OUTPUT_DIR/$DIFF_2/$(basename $k)"
-    done
-## User provided 2 git references to compare
 elif [ $# -eq 2 ]; then
     DIFF_1="$1"
     DIFF_2="$2"
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_1" "$DIFF_2" | grep '.kicad_pcb')
-    if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
-    # Copy all modified kicad_file to $OUTPUT_DIR/current
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_1"
-        git show "$DIFF_1:$k" > "$OUTPUT_DIR/$DIFF_1/$(basename $k)"
-    done
-    # Copy the specified git commit kicad_file to $OUTPUT_DIR/$(git ref)
-    for k in $CHANGED_KICAD_FILES; do
-        mkdir -p "$OUTPUT_DIR/$DIFF_2"
-        echo "Copying $DIFF_2:$k to $OUTPUT_DIR/$DIFF_2/$k"
-        git show "$DIFF_2:$k" > "$OUTPUT_DIR/$DIFF_2/$(basename $k)"
-    done
-## User provided too many git referencess
+## User provided too many git references
 else
     echo "Please only provide 1 or 2 arguments: not $#"
     exit 2
 fi
 
+    if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
+
+
+
+    for k in $CHANGED_KICAD_FILES; do
+	echo "Handling $k"
+	if [ $DIFF_1 == "current" ]; then
+        	mkdir -p "$OUTPUT_DIR/$DIFF_1"
+		echo "Copying '$CHECKOUT_ROOT/$k' to $OUTPUT_DIR/current/$k"
+        	cp "$CHECKOUT_ROOT/$k" $OUTPUT_DIR/current
+	else
+		export_git_file_to_dir $k $DIFF_1 $OUTPUT_DIR
+	fi
+
+	export_git_file_to_dir $k $DIFF_2 $OUTPUT_DIR
+    done
+
+
+
+
 echo "Kicad files saved to:  '$OUTPUT_DIR/$DIFF_1' and '$OUTPUT_DIR/$DIFF_2'"
 
-# Generate png files from kicad output
-#######################################
-mkdir -p /tmp/pdf/$DIFF_1
-for f in $OUTPUT_DIR/$DIFF_1/*.kicad_pcb; do
-    echo "Converting $f to .pdf:  Files will be saved to /tmp/pdf"
-    python $PLOT_BOARD_PATH "$f" "/tmp/pdf/$DIFF_1"
-done
-
-mkdir -p /tmp/pdf/$DIFF_2
-for f in $OUTPUT_DIR/$DIFF_2/*.kicad_pcb; do
-    echo "Converting $f to .pdf's Files will be saved to /tmp/pdf"
-    python $PLOT_BOARD_PATH "$f" "/tmp/pdf/$DIFF_2"
-done
+board_to_pdf $DIFF_1 $OUTPUT_DIR "/tmp/pdf"
+board_to_pdf $DIFF_2 $OUTPUT_DIR "/tmp/pdf"
 
 # Generate png diffs
 ####################
@@ -93,3 +91,6 @@ mkdir -p $DIFF_DIR
 echo "Generating visual diffs"
 echo "Output will be in $DIFF_DIR"
 find /tmp/pdf/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 /tmp/pdf/$DIFF_1/%.pdf /tmp/pdf/$DIFF_2/%.pdf $DIFF_DIR/%.png
+
+
+
