@@ -10,14 +10,21 @@ PYTHON_PATH=${PYTHON_PATH:-python}
 CHECKOUT_ROOT=$(git rev-parse --show-toplevel)
 
 export_git_file_to_dir () {
-	file=$1
-	rev_id=$2
-	output=$3
+    file=$1
+    rev_id=$2
+    output=$3
         mkdir -p "$output/$rev_id"
-        echo "Copying $output:$k to $output/$rev_id/"
-        git show "$rev_id:$k" > "$output/$rev_id/$(basename $k)"
+        git show "$rev_id:$file" > "$output/$rev_id/$(basename $file)"
 }
 
+export_checkout_file_to_dir () {
+    file=$1
+    rev_id=$2
+    output=$3
+
+        mkdir -p "$output/$rev_id"
+           cp "$CHECKOUT_ROOT/$file" "$output/$rev_id"
+}
 
 board_to_pdf() {
     rev_id=$1
@@ -33,7 +40,36 @@ board_to_pdf() {
 
 }
 
+make_montage() {
+    DIFF_FILES=$(ls -a $DIFF_DIR/*.png)
+    montage -mode concatenate -tile 1x $DIFF_DIR/*-Bottom.png $DIFF_DIR/*-CuBottom.png $DIFF_DIR/*-CuTop.png $DIFF_DIR/*-Top.png $DIFF_DIR/montage.png
+}
 
+
+pdf_to_png_diffs() {
+    export DIFF_DIR="$OUTPUT_DIR/diff-$DIFF_1-$DIFF_2" 
+    mkdir -p $DIFF_DIR
+    
+    echo "Generating visual diffs"
+    echo "Output will be in $DIFF_DIR"
+    find /tmp/pdf/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 /tmp/pdf/$DIFF_1/%.pdf /tmp/pdf/$DIFF_2/%.pdf $DIFF_DIR/%.png 
+    find $DIFF_DIR -name \*png |xargs -n 1 -P 0 -I % convert -trim % %
+
+    
+}
+
+export_one_git_file () {
+    diff_1=$1
+    diff_2=$2
+    file=$3
+    if [ $diff_1 == "current" ]; then
+        export_checkout_file_to_dir $file $diff_1 $OUTPUT_DIR
+    else
+        export_git_file_to_dir $file $diff_1 $OUTPUT_DIR
+    fi
+
+    export_git_file_to_dir $file $diff_2 $OUTPUT_DIR
+}
 # Find .kicad_files that differ between commits
 ###############################################
 
@@ -57,23 +93,13 @@ else
     exit 2
 fi
 
-    if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
+if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
 
 
 
     for k in $CHANGED_KICAD_FILES; do
-	echo "Handling $k"
-	if [ $DIFF_1 == "current" ]; then
-        	mkdir -p "$OUTPUT_DIR/$DIFF_1"
-		echo "Copying '$CHECKOUT_ROOT/$k' to $OUTPUT_DIR/current/$k"
-        	cp "$CHECKOUT_ROOT/$k" $OUTPUT_DIR/current
-	else
-		export_git_file_to_dir $k $DIFF_1 $OUTPUT_DIR
-	fi
-
-	export_git_file_to_dir $k $DIFF_2 $OUTPUT_DIR
+    export_one_git_file $DIFF_1 $DIFF_2 $k
     done
-
 
 
 
@@ -82,19 +108,6 @@ echo "Kicad files saved to:  '$OUTPUT_DIR/$DIFF_1' and '$OUTPUT_DIR/$DIFF_2'"
 board_to_pdf $DIFF_1 $OUTPUT_DIR "/tmp/pdf"
 board_to_pdf $DIFF_2 $OUTPUT_DIR "/tmp/pdf"
 
-# Generate png diffs
-####################
 
-export DIFF_DIR="$OUTPUT_DIR/diff-$DIFF_1-$DIFF_2" 
-mkdir -p $DIFF_DIR
-
-echo "Generating visual diffs"
-echo "Output will be in $DIFF_DIR"
-find /tmp/pdf/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 /tmp/pdf/$DIFF_1/%.pdf /tmp/pdf/$DIFF_2/%.pdf $DIFF_DIR/%.png
-
-
-DIFF_FILES=$(ls -a $DIFF_DIR/*.png)
-
-montage -mode concatenate -tile 1x $(ls -a $DIFF_DIR/*.png) $DIFF_DIR/montage.png
-
-
+pdf_to_png_diffs
+make_montage
