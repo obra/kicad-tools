@@ -1,19 +1,19 @@
 Plan of action:
-	Update symmetric 60 to pull makefile from new repo
-	create our own dockerfile
-	write docker wrapper that generates a PDF schematic for fab output
-	update makefile to use docker wrapper that generates schematic for fab output
-	write docker wrapper that generates our BOM for fab output	
-	update makefile to use docker wrapper that generates BOM for fab output
-	update makefile to use
+x	Update symmetric 60 to pull makefile from new repo
+x	create our own dockerfile
+x	write docker wrapper that generates a PDF schematic for fab output
+x	update makefile to use docker wrapper that generates schematic for fab output
+x	write docker wrapper that generates our BOM for fab output	
+x	update makefile to use docker wrapper that generates BOM for fab output
+x	update makefile to use
 
-	update dockerfile to push iBOM into docker
-	write docker wrapper that generates iBOM for fab output
-	update makefile to use
+x	update dockerfile to push iBOM into docker
+x	write docker wrapper that generates iBOM for fab output
+x	update makefile to use
 	
-	update dockerfile to push kiplot into docker
-	write docker wrapper to do kiplotting for fab output
-	update makefile to use
+x	update dockerfile to push kiplot into docker
+x	write docker wrapper to do kiplotting for fab output
+x	update makefile to use
 	
 	document git practices (smudging and modding to reduce churn)
 
