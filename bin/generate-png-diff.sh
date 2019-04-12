@@ -27,7 +27,7 @@ board_to_pdf() {
     mkdir -p $output_dir/$DIFF_1
     for f in $input_dir/$rev_id/*.kicad_pcb; do
         echo "Converting $f to .pdf:  Files will be saved to $output_dir"
-        $PYTHON_PATH $PLOT_BOARD_PATH "$f" "$output_dir/$rev_id"
+        $PYTHON_PATH $PLOT_BOARD_PATH "$f" "$output_dir/$rev_id" pdf
     done
 
 
