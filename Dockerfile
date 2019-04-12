@@ -67,11 +67,21 @@ RUN cd /opt/kiplot && pip3 install -e .
 
 COPY etc/kiplot /opt/etc/kiplot
 
+
+RUN apt-get -y remove python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+
 # Install the interactive BOM
 
 COPY upstream/InteractiveHtmlBom /opt/InteractiveHtmlBom
 COPY scripts/make-interactive-bom /opt/InteractiveHtmlBom/
 
-
-RUN apt-get -y remove python3-pip && \
+# Install image diffing
+RUN apt-get -y update && \
+    apt-get install -y imagemagick && \
     rm -rf /var/lib/apt/lists/*
+
+COPY bin/generate-png-diff.sh /opt/diff-boards/
+COPY bin/git-imgdiff /opt/diff-boards/
+COPY bin/plot_board.py /opt/diff-boards/
