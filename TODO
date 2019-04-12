@@ -45,7 +45,11 @@ x	update makefile to use
 		
 
 
-	
+	update docker config to split out "path to share to docker" and "path to schematic"
+
+
+Prior art:
+https://scottbezek.blogspot.com/2016/04/scripting-kicad-pcbnew-exports.html	
 
 Maybe include:
 
