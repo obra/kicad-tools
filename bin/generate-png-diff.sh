@@ -45,11 +45,11 @@ if [ $# -eq 0 ]; then
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
 elif [ $# -eq 1 ]; then
     DIFF_1="current"
-    DIFF_2="$1"
+    DIFF_2="$(git rev-parse --short $1)"
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
 elif [ $# -eq 2 ]; then
-    DIFF_1="$1"
-    DIFF_2="$2"
+    DIFF_1="$(git rev-parse --short $1)"
+    DIFF_2="$(git rev-parse --short $2)"
     CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_1" "$DIFF_2" | grep '.kicad_pcb')
 ## User provided too many git references
 else
