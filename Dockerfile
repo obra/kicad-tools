@@ -68,6 +68,10 @@ RUN cd /opt/kiplot && pip3 install -e .
 COPY etc/kiplot /opt/etc/kiplot
 
 
+# Install KiCost
+
+RUN pip3 install 'kicost==1.0.4'
+
 RUN apt-get -y remove python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
