@@ -10,6 +10,8 @@ PLOT_BOARD_PATH=${PLOT_BOARD_PATH:-/opt/diff-boards/plot_board.py}
 PYTHON_PATH=${PYTHON_PATH:-python}
 
 CHECKOUT_ROOT=$(git rev-parse --show-toplevel)
+mkdir -p $BOARD_CACHE_DIR
+
 
 export_git_file_to_dir () {
     file=$1
@@ -52,38 +54,30 @@ pdf_to_png_diffs() {
     mkdir -p $DIFF_DIR
     
     echo "Generating visual diffs"
-    echo "Output will be in $DIFF_DIR"
+    echo "Output will be in $DIFF_DIR/montage.png"
     find $BOARD_CACHE_DIR/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 $BOARD_CACHE_DIR/$DIFF_1/%.pdf $BOARD_CACHE_DIR/$DIFF_2/%.pdf $DIFF_DIR/%.png 
     find $DIFF_DIR -name \*png |xargs -n 1 -P 0 -I % convert -trim % %
 
     
 }
 
+if [ $# -eq 3 ]; then
+    FILENAME=$3
+ 	   DIFF_1="$(git rev-parse --short $1)"
+    if [ "$2" == "current" ]; then
+	DIFF_2="current"
+    CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_1" | grep $FILENAME)
+    else 
+    	DIFF_2="$(git rev-parse --short $2)"
+    CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_1" "$DIFF_2" | grep $FILENAME)
+    fi
 
-# Find .kicad_files that differ between commits
-###############################################
 
-## Look at number of arguments provided set different variables based on number of git refs
-## User provided no git references, compare against last git commit
-if [ $# -eq 0 ]; then
-    DIFF_1="current"
-    DIFF_2="$(git rev-parse --short HEAD)"
-    CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
-elif [ $# -eq 1 ]; then
-    DIFF_1="current"
-    DIFF_2="$(git rev-parse --short $1)"
-    CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_2" | grep '.kicad_pcb')
-elif [ $# -eq 2 ]; then
-    DIFF_1="$(git rev-parse --short $1)"
-    DIFF_2="$(git rev-parse --short $2)"
-    CHANGED_KICAD_FILES=$(git diff --name-only "$DIFF_1" "$DIFF_2" | grep '.kicad_pcb')
-## User provided too many git references
+
 else
-    echo "Please only provide 1 or 2 arguments: not $#"
-    exit 2
+	echo "$0 takes three arguments: REV1, REV2, and a FILENAME\n"
+	echo "\nTo compare against the current checkout, use the special REV2 'current'"
 fi
-
-if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && exit 0; fi
 
 
 
