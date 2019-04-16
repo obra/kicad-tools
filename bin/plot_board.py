@@ -63,7 +63,7 @@ pctl = PLOT_CONTROLLER(board)
 
 popt = pctl.GetPlotOptions()
 
-# popt.SetOutputDirectory("plot/")
+
 popt.SetOutputDirectory(sys.argv[2])
 
 if sys.argv[3] == 'svg': 

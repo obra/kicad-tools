@@ -3,7 +3,9 @@
 # If only one ref specified, generates a diff from that file
 # If no refs specified, assumes HEAD
 
+BOARD_CACHE_DIR=".cache/board"
 OUTPUT_DIR="./plot"
+
 PLOT_BOARD_PATH=${PLOT_BOARD_PATH:-/opt/diff-boards/plot_board.py}
 PYTHON_PATH=${PYTHON_PATH:-python}
 
@@ -21,20 +23,19 @@ export_checkout_file_to_dir () {
     file=$1
     rev_id=$2
     output=$3
-
-        mkdir -p "$output/$rev_id"
-           cp "$CHECKOUT_ROOT/$file" "$output/$rev_id"
+    mkdir -p "$output/$rev_id"
+    cp "$CHECKOUT_ROOT/$file" "$output/$rev_id"
 }
 
 board_to_pdf() {
     rev_id=$1
     input_dir=$2
     output_dir=$3
+
     
-    mkdir -p $output_dir/$DIFF_1
+    mkdir -p $output_dir/$rev_id
     for f in $input_dir/$rev_id/*.kicad_pcb; do
-        echo "Converting $f to .pdf:  Files will be saved to $output_dir"
-        $PYTHON_PATH $PLOT_BOARD_PATH "$f" "$output_dir/$rev_id" pdf
+	echo "Exporting ${f} to ${output_dir}/${rev_id}"
     done
 
 
@@ -52,23 +53,10 @@ pdf_to_png_diffs() {
     
     echo "Generating visual diffs"
     echo "Output will be in $DIFF_DIR"
-    find /tmp/pdf/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 /tmp/pdf/$DIFF_1/%.pdf /tmp/pdf/$DIFF_2/%.pdf $DIFF_DIR/%.png 
+    find $BOARD_CACHE_DIR/$DIFF_1/ -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 $BOARD_CACHE_DIR/$DIFF_1/%.pdf $BOARD_CACHE_DIR/$DIFF_2/%.pdf $DIFF_DIR/%.png 
     find $DIFF_DIR -name \*png |xargs -n 1 -P 0 -I % convert -trim % %
 
     
-}
-
-export_one_git_file () {
-    diff_1=$1
-    diff_2=$2
-    file=$3
-    if [ $diff_1 == "current" ]; then
-        export_checkout_file_to_dir $file $diff_1 $OUTPUT_DIR
-    else
-        export_git_file_to_dir $file $diff_1 $OUTPUT_DIR
-    fi
-
-    export_git_file_to_dir $file $diff_2 $OUTPUT_DIR
 }
 
 
@@ -99,14 +87,26 @@ if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && ex
 
 
 
+prepare_one_file() {
+	file=$1
+	revision=$2
+    if [ $revision == "current" ]; then
+        export_checkout_file_to_dir $file $revision $BOARD_CACHE_DIR
+    else
+	if [ -f $BOARD_CACHE_DIR/$revision/$(basename $file) ]; then
+		return
+	fi
+        export_git_file_to_dir $file $revision $BOARD_CACHE_DIR
+    fi
+
+        $PYTHON_PATH $PLOT_BOARD_PATH "$BOARD_CACHE_DIR/$revision/$(basename $file)" "." pdf #"$output_dir/$rev_id" pdf
+}
+
 for k in $CHANGED_KICAD_FILES; do
- export_one_git_file $DIFF_1 $DIFF_2 $k
+	prepare_one_file $k $DIFF_1
+	prepare_one_file $k $DIFF_2
 done
-
-echo "Kicad files saved to:  '$OUTPUT_DIR/$DIFF_1' and '$OUTPUT_DIR/$DIFF_2'"
-
-board_to_pdf $DIFF_1 $OUTPUT_DIR "/tmp/pdf"
-board_to_pdf $DIFF_2 $OUTPUT_DIR "/tmp/pdf"
 
 pdf_to_png_diffs
 make_montage
+rm -rf "$BOARD_CACHE_DIR/current"
