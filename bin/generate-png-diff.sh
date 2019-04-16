@@ -70,6 +70,8 @@ export_one_git_file () {
 
     export_git_file_to_dir $file $diff_2 $OUTPUT_DIR
 }
+
+
 # Find .kicad_files that differ between commits
 ###############################################
 
@@ -97,17 +99,14 @@ if [[ -z "$CHANGED_KICAD_FILES" ]]; then echo "No .kicad_pcb files differ" && ex
 
 
 
-    for k in $CHANGED_KICAD_FILES; do
-    export_one_git_file $DIFF_1 $DIFF_2 $k
-    done
-
-
+for k in $CHANGED_KICAD_FILES; do
+ export_one_git_file $DIFF_1 $DIFF_2 $k
+done
 
 echo "Kicad files saved to:  '$OUTPUT_DIR/$DIFF_1' and '$OUTPUT_DIR/$DIFF_2'"
 
 board_to_pdf $DIFF_1 $OUTPUT_DIR "/tmp/pdf"
 board_to_pdf $DIFF_2 $OUTPUT_DIR "/tmp/pdf"
-
 
 pdf_to_png_diffs
 make_montage
