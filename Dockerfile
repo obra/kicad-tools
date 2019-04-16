@@ -69,12 +69,13 @@ COPY etc/kiplot /opt/etc/kiplot
 
 
 # Install KiCost
-
-RUN pip3 install 'kicost==1.0.4'
-
-RUN apt-get -y remove python3-pip && \
-    rm -rf /var/lib/apt/lists/*
-
+#
+# Disabled because KiCost depends on Octopart which no longer has a free API
+#RUN pip3 install 'kicost==1.0.4'
+#
+#RUN apt-get -y remove python3-pip && \
+#    rm -rf /var/lib/apt/lists/*
+#
 
 # Install the interactive BOM
 
