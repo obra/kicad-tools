@@ -57,6 +57,10 @@ https://github.com/vslavik/diff-pdf
 
 
 
+Issues	
+	management of kicad libraries outside the project directory
+
+
 Output breaks when there's no tag in the history:
 
 fatal: No names found, cannot describe anything.
@@ -82,4 +86,10 @@ sudo docker run --rm --interactive --tty --volume $(pwd):/kicad-project: kicad-a
 
 
 python -m kicad-automation.eeschema.schematic export --all_pages  -f pdf /kicad-project/symmetric60.sch /kicad-project/
+
+
+kicost
+	octopart API
+
+		https://octopart.com/api/register
 
