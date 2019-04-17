@@ -87,6 +87,6 @@ RUN apt-get -y update && \
     apt-get install -y imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
-COPY bin/generate-png-diff.sh /opt/diff-boards/
-COPY bin/git-imgdiff /opt/diff-boards/
-COPY bin/plot_board.py /opt/diff-boards/
+COPY bin-on-docker/git-diff-boards.sh /opt/diff-boards/
+#COPY bin/git-imgdiff /opt/diff-boards/
+COPY bin-on-docker/plot_board.py /opt/diff-boards/

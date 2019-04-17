@@ -1,0 +1,17 @@
+# Docker config
+if [ "x$DOCKER_NEEDS_SUDO" != "x" ]; then
+	DOCKER_SUDO=sudo
+fi
+
+DOCKER_CMD_PATH="${DOCKER_CMD_PATH:-docker}"
+DOCKER_CONTAINER="${DOCKER_CONTAINER:-kicad-automation}"
+
+DOCKER_RUN=${DOCKER_SUDO} ${DOCKER_CMD_PATH} \
+ 	run \
+	--rm \
+	--interactive --tty \
+	${DOCKER_VOLUMES} \
+	${DOCKER_CONTAINER} \
+	$@
+
+exec $DOCKER_RUN
