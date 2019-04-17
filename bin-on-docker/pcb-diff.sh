@@ -6,36 +6,49 @@ PYTHON_PATH=${PYTHON_PATH:-python3}
 BOARD_CACHE_DIR=/board-cache
 IPC_DIR=/ipc
 
-DIFF_DIR=$(mktemp -d)
+DIFF_DIR=/tmp/diff
+mkdir -p $DIFF_DIR
 
-LEFT_SHA=$(shasum $IPC_DIR/left/board.kicad_pcb|cut -c 1-40)
-RIGHT_SHA=$(shasum $IPC_DIR/right/board.kicad_pcb|cut -c 1-40)
+plot_board() {
+	sha=$1
+	dir=$2
+	input_path=$3
 
+	# If we've run this processing before, we don't need to do it again	
+	if [ -f $dir/board-Top.png ]; then
+		return
+	fi
+
+	if [ ! -d $dir ]; then
+	 	mkdir -p $dir
+	fi
+
+	board_file=$dir/board.kicad_pcb
+	cp $input_path $board_file
+	$PYTHON_PATH $PLOT_BOARD_PATH  $board_file $dir pdf
+	find $dir -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % convert +profile "icc" -density 150 $dir/%.pdf $dir/%.png
+}
+
+
+LEFT_INPUT=$IPC_DIR/left/board.kicad_pcb
+LEFT_SHA=$(shasum $LEFT_INPUT |cut -c 1-40)
 LEFT_DIR=$BOARD_CACHE_DIR/$LEFT_SHA 
+
+RIGHT_INPUT=$IPC_DIR/right/board.kicad_pcb
+RIGHT_SHA=$(shasum $RIGHT_INPUT |cut -c 1-40)
 RIGHT_DIR=$BOARD_CACHE_DIR/$RIGHT_SHA
 
-if [ ! -d $LEFT_DIR ]; then
- mkdir $LEFT_DIR
-fi
 
-if [ ! -d $RIGHT_DIR ]; then 
- mkdir $RIGHT_DIR
-fi
-
-LEFT_BOARD_FILE=$LEFT_DIR/board.kicad_pcb
-RIGHT_BOARD_FILE=$RIGHT_DIR/board.kicad_pcb
+plot_board $LEFT_SHA $LEFT_DIR $LEFT_INPUT
+plot_board $RIGHT_SHA $RIGHT_DIR $RIGHT_INPUT
 
 
-cp $IPC_DIR/left/board.kicad_pcb $LEFT_BOARD_FILE
-cp $IPC_DIR/right/board.kicad_pcb $RIGHT_BOARD_FILE
-
-$PYTHON_PATH $PLOT_BOARD_PATH  $LEFT_BOARD_FILE $LEFT_DIR pdf
-$PYTHON_PATH $PLOT_BOARD_PATH  $RIGHT_BOARD_FILE $RIGHT_DIR pdf
-
-find $LEFT_DIR -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % composite -stereo 0 -density 300 $LEFT_DIR/%.pdf $RIGHT_DIR/%.pdf $DIFF_DIR/%.png
+find $LEFT_DIR -name \*.png |xargs -n 1 basename -s .png | xargs -n 1 -P 0 -I % composite -stereo 0 $LEFT_DIR/%.png $RIGHT_DIR/%.png $DIFF_DIR/%.png
 
 find $DIFF_DIR -name \*png |xargs -n 1 -P 0 -I % convert -trim % %
 DIFF_FILES=$(ls -a $DIFF_DIR/*.png)
+
+
 montage -mode concatenate -tile 1x $DIFF_DIR/*-Bottom.png $DIFF_DIR/*-CuBottom.png $DIFF_DIR/*-CuTop.png $DIFF_DIR/*-Top.png $IPC_DIR/montage.png
 
 exit;
