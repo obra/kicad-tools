@@ -2,6 +2,8 @@
 
 MAKEFILE_PATH := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 DOCKER_VISIBLE_PATH := $(abspath $(MAKEFILE_PATH)/..)
+
+# We should be using realpath(1) here)
 PROJECT_PATH := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 PROJECT_ABS_PATH := $(DOCKER_VISIBLE_PATH)/$(PROJECT_PATH)
 

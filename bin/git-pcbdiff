@@ -1,0 +1,25 @@
+#!/bin/sh
+
+LEFT=$1
+RIGHT=$2
+
+
+DOCKER_RUN=${DOCKER_RUN:-$(realpath $(dirname $0))/kicad-docker-run}
+
+
+IPC_DIR=$(mktemp -d)
+mkdir -p $IPC_DIR/left
+mkdir -p $IPC_DIR/right
+cp $LEFT $IPC_DIR/left/board.kicad_pcb
+cp $RIGHT $IPC_DIR/right/board.kicad_pcb
+
+BOARD_CACHE_DIR="${BOARD_CACHE_DIR:-/tmp/.board_cache}"
+export DOCKER_VOLUMES="--volume ${BOARD_CACHE_DIR}:/board-cache: \
+                --volume ${IPC_DIR}:/ipc: "
+
+$DOCKER_RUN /opt/diff-boards/pcb-diff.sh
+
+display -alpha off ${IPC_DIR}/montage.png
+
+exit
+
