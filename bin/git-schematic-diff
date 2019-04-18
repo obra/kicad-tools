@@ -1,0 +1,60 @@
+#!/bin/sh
+
+if [ $# -eq 3 ]; then
+	LEFT=$1
+	RIGHT=$2
+	FILE=$3
+elif [ $# -eq 2 ]; then
+	LEFT=$1
+	FILE=$2
+else 
+	echo "This tool takes two or three arguiments."
+	echo "The first argument is a git ref to compare against"
+	echo "The second, optional, argument is another git ref to compare"
+	echo "If ommitted, we compare to the current checkout"
+	echo "The final argument is the path to a schematic file"
+fi
+
+
+DOCKER_RUN=${DOCKER_RUN:-$(realpath $(dirname $0))/kicad-docker-run}
+
+TOPLEVEL=$(git rev-parse --show-toplevel)
+ABSFILE=$(realpath --relative-to="$TOPLEVEL" $FILE )
+SCHEMATIC_DIR=$(dirname $ABSFILE)
+
+IPC_DIR=$(mktemp -d)
+mkdir -p $IPC_DIR/left
+mkdir -p $IPC_DIR/right
+
+echo "LEFT is $LEFT"
+echo "RIGHT is $RIGHT"
+
+git rev-parse $LEFT > $IPC_DIR/left-sha
+(cd `git rev-parse --show-toplevel` && git archive --format=tar "$LEFT" ) | (cd $IPC_DIR/left && tar xf - )
+
+if [ "x$RIGHT" != "x" ]; then
+	git rev-parse $RIGHT > $IPC_DIR/right-sha
+	(cd `git rev-parse --show-toplevel` && git archive --format=tar "$RIGHT" ) | (cd $IPC_DIR/right && tar xf - )
+else 
+	echo "current-checkout" > $IPC_DIR/right-sha
+	(cd `git rev-parse --show-toplevel` && tar --exclude ./.git -cf - . ) | (cd $IPC_DIR/right && tar xf - )
+	
+fi
+
+
+echo "RIGHT: "
+cat $IPC_DIR/right-sha
+
+echo "LEFT"
+cat $IPC_DIR/left-sha
+
+SCHEMATIC_CACHE_DIR="${BOARD_CACHE_DIR:-/tmp/.schematic_cache}"
+export DOCKER_VOLUMES="--volume ${SCHEMATIC_CACHE_DIR}:/schematic-cache: \
+                --volume ${IPC_DIR}:/ipc: "
+
+$DOCKER_RUN /opt/diff-boards/schematic-diff.sh $SCHEMATIC_DIR $FILE
+
+display -alpha off ${IPC_DIR}/montage.png &
+
+exit
+

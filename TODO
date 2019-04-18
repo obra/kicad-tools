@@ -99,3 +99,9 @@ image diffs
 	https://varya.me/en/posts/image-diffs-with-git/
 
 	doesn't deal well with page size changes
+
+git diftool config
+       diff.guitool
+           The default diff tool to use when --gui is specified.
+
+
