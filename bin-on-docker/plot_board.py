@@ -82,7 +82,7 @@ popt.SetMirror(False)
 popt.SetUseGerberAttributes(True)
 popt.SetExcludeEdgeLayer(False);
 popt.SetScale(1)
-popt.SetUseAuxOrigin(True)
+popt.SetUseAuxOrigin(False)
 popt.SetSkipPlotNPTH_Pads(False)
 popt.SetPlotViaOnMaskLayer(True)
 popt.SetSubtractMaskFromSilk(True)
