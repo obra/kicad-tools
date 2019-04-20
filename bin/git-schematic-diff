@@ -8,11 +8,14 @@ elif [ $# -eq 2 ]; then
 	LEFT=$1
 	FILE=$2
 else 
+	echo "$0 REV1 [REV2] schematic.sch"
+	echo
 	echo "This tool takes two or three arguiments."
 	echo "The first argument is a git ref to compare against"
 	echo "The second, optional, argument is another git ref to compare"
 	echo "If ommitted, we compare to the current checkout"
 	echo "The final argument is the path to a schematic file"
+	exit -1
 fi
 
 
