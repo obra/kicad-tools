@@ -26,7 +26,7 @@ plot_schematic() {
 	 	mkdir -p $output_path
 	fi
 
-        python -m kicad-automation.eeschema.schematic --schematic $input_path --output_dir $output_path --screencast_dir $output_path export --all_pages  -f pdf && \
+        python -m kicad-automation.eeschema.schematic --schematic $input_path --output_dir $output_path export --all_pages  -f pdf && \
 	find $output_path -name \*.pdf |xargs -n 1 basename -s .pdf | xargs -n 1 -P 0 -I % convert +profile "icc" -density 150 $output_path/%.pdf $output_path/%.png && \
 	touch $output_path/.generated
 }
