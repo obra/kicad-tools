@@ -96,6 +96,27 @@ To enable automatic graphical diffs of PCB layouts, you need to teach git how to
 ```
 
 
+## Caching
+
+Generating diff-able PNGs of schematics and boards is a fairly slow operation. Because of that, we
+cache the generated files. By default, they're cached in /tmp. Each board and schematic is uniquely identified in the cache, so it's safe to share a cache across multiple projects.
+
+You may want to consider caching them directories that persist across reboots.
+
+To configure the PCB image cache, set the environment variable `BOARD_CACHE_DIR`. For example, you could add this to your `.bashrc`
+
+```
+export BOARD_CACHE_DIR=$HOME/.kicad-tools/cache/boards
+```
+
+To configure the schematic image cache, set the environment variable `SCHEMATIC_CACHE_DIR`. For example, you could add this to your `.bashrc`
+
+```
+export SCHEMATIC_CACHE_DIR=$HOME/.kicad-tools/cache/schematics
+```
+
+
+
 ## Usage
 
 ### Generating build artifacts
