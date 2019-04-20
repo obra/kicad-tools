@@ -1,0 +1,102 @@
+# Kicad Automation Tools
+
+## What's in the package 
+
+This project packages up a number of productivity-enhancing tools for KiCad (https://kicad-pcb.org), primarily
+focused on automating generation of fabrication outputs and commandline productivity for projects tracked in git.
+
+### Fabrication outputs
+
+`make fabrication-outputs` wil automatically create the following outputs in an output directory:
+
+* Schematics in PDF and SVG formats
+* BOM as a .csv file
+* Interactive HTML BOM file
+* Layout files in DXF, Gerber (including drill files), PDF, and SVG. 
+
+All of this is built on other projects:
+
+https://github.com/openscopeproject/InteractiveHtmlBom
+https://github.com/productize/kicad-automation-scripts
+https://github.com/scottbez1/splitflap
+https://github.com/johnbeard/kiplot
+
+
+## Installation
+
+### Prerequisites
+
+As of this writing, these tools target KiCad 5.1, running in a Docker container. While Docker does add a small amount of overhead, it helps compartmentalize the complexity of orchestratitng these tools and (most importantly) makes it possible to generate schematic output from `eeschema` by running KiCad on a known configuration of an Ubuntu machine with a headless virtual X server.
+
+Theoretically, Dockerization makes it possible to run these tools on Windows or MacOS, though that is as-yet untestd.
+
+Before setting up this package, you should have both Docker and git installed on your workstation.
+
+1. Download and install this package somewhere on your system. For the sake of these instructions, we will assume you placed it in /opt/kicad-tools/
+2. Build and deploy the local docker container.
+	```
+	cd /opt/kicad-tools
+	make
+	```
+
+This will spin for a while, downloading Ubuntu, KiCad, and the various tools we use.
+
+If you get an erorr about being unable to connect to Docker, your Docker configuration
+may require you to 'sudo' to run Docker. In that case
+```sudo make```
+
+Eventually, you should see something like 'Successfully built 6476202f4575'
+
+3. Add our 'bin' directory to your shell's path. Typically, you'd do that by adding the line
+`export PATH=/opt/kicad-tools/bin:$PATH`
+
+to your `.bashrc` or its equivalent.
+
+If you needed to run `sudo make` before, you should also add the line
+
+```export DOCKER_NEEDS_SUDO=1``` just below the PATH line.
+
+
+You will need to restart your shell before it picks up a change to 
+
+If you'd prefer to be able to run Docker containers without `sudo`, 
+you can find instructions for that here: 
+https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user
+
+
+You can verify that everything you've done so far is working by typing 
+`kicad-docker-run hostname`
+
+You should see something like this:
+
+```$ kicad-docker-run hostname
+0230e9b27ebb
+```
+
+If you don't get an error, things are on the right track.
+
+## Configuring a project
+
+### Makefile
+
+A sample Makefile is distributed with this package. You can find it in the 'etc' directory.
+
+```cp /opt/git-tools/etc/Makefile ./Makefile```
+
+WARNING: DO NOT BLINDLY RUN THAT COMMAND IF YOU ALREADY HAVE A MAKEFILE.
+
+### Git
+
+To enable automatic graphical diffs of PCB layouts, you need to teach git how to handle
+.kicad_pcb files
+
+# echo "*.kicad_pcb diff=kicad_pcb" >> `git rev-parse --show-toplevel)`/.gitattributes
+# git config diff.kicad_pcb.command /opt/kicad-tools/bin/git-pcbdiff
+
+
+
+## Usage
+
+### Generating build artifacts
+
+### Comparing revision to schematics and layouts
