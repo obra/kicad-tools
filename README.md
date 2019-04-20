@@ -108,32 +108,32 @@ To customize the output directory, set the `OUTPUT_PATH` environment variable.
 To generate a whole package of fabrication outputs, 
 
 ```
-# make fabrication-outputs
+$ make fabrication-outputs
 ```
 
 To generate SVG schematics
 ```
-# make schematic-svg
+$ make schematic-svg
 ```
 
 To generate PDF schematics
 ```
-# make schematic-pdf
+$ make schematic-pdf
 ```
 
 To generate gerbers, pdfs, dxfs, and svgs of your layout
 ``` 
-# make gerbers
+$ make gerbers
 ```
 
 To generate a CSV bom
 ```
-# make bom
+$ make bom
 ```
 
 To generate an HTML interactive BOM
 ```
-# make interactive-bom
+$ make interactive-bom
 ```
 
 If you need to log into the docker instance to debug something, there's a makefile target for that, too
@@ -142,5 +142,31 @@ If you need to log into the docker instance to debug something, there's a makefi
 #make docker-shell
 ```
 
+### Visual "diffs" between versions of a .kicad_pcb file
 
-### Comparing revision to schematics and layouts
+If you've configured git as described above, the regular `git diff` tool will show you a visual diff between two versions of a .kicad_pcb file.
+
+In the future, this functionality may move to only running if you use `git difftool -gui`
+
+To show the difference between your current checkout and the `HEAD` of your current branch, run
+
+```
+$ git diff HEAD my_board.kicad_pcb
+```
+
+
+### Visual "diffs" between versions of a .sch file
+
+Due to some limitations in the information `git` provides to external git diff tools, you need to use a special command to compare schematics.
+
+To compare the current checkout to the `HEAD` of your current branch
+
+```
+$ git schematic-diff HEAD my_board.sch
+```
+
+To compare the version of my_board.sch in `master` to the version as of tag `rev1`
+
+```
+$ git schematic-diff master rev1 my_board.sch
+```
