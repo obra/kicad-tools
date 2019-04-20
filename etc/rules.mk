@@ -30,9 +30,6 @@ DOCKER_RUN := $(TOOLS_HOME)/bin/kicad-docker-run
 
 
 
-path:
-	@echo $(current_dir)
-
 all: 
 	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
 

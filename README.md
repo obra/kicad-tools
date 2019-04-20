@@ -99,4 +99,47 @@ To enable automatic graphical diffs of PCB layouts, you need to teach git how to
 
 ### Generating build artifacts
 
+By default, all build artifacts are created in a subdirectory of the 'out' directory of your project.
+To customize the name of the subdirectory artifacts are created in, set the `BOARD_SNAPSHOT_LABEL` environment variable.
+
+To customize the output directory, set the `OUTPUT_PATH` environment variable.
+
+To generate a whole package of fabrication outputs, 
+
+```
+# make fabrication-outputs
+```
+
+To generate SVG schematics
+```
+# make schematic-svg
+```
+
+To generate PDF schematics
+```
+# make schematic-pdf
+```
+
+To generate gerbers, pdfs, dxfs, and svgs of your layout
+``` 
+# make gerbers
+```
+
+To generate a CSV bom
+```
+# make bom
+```
+
+To generate an HTML interactive BOM
+```
+# make interactive-bom
+```
+
+If you need to log into the docker instance to debug something, there's a makefile target for that, too
+
+```
+#make docker-shell
+```
+
+
 ### Comparing revision to schematics and layouts
