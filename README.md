@@ -160,7 +160,7 @@ $ make interactive-bom
 If you need to log into the docker instance to debug something, there's a makefile target for that, too
 
 ```
-#make docker-shell
+$ make docker-shell
 ```
 
 ### Visual "diffs" between versions of a .kicad_pcb file
