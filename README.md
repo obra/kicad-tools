@@ -16,10 +16,10 @@ focused on automating generation of fabrication outputs and commandline producti
 
 All of this is built on other projects:
 
-https://github.com/openscopeproject/InteractiveHtmlBom
-https://github.com/productize/kicad-automation-scripts
-https://github.com/scottbez1/splitflap
-https://github.com/johnbeard/kiplot
+* [InteractiveHtmlBom](https://github.com/openscopeproject/InteractiveHtmlBom)
+* [kicad-automation-script](https://github.com/productize/kicad-automation-scripts)
+* [splitflap](https://github.com/scottbez1/splitflap)
+* [kiplot](https://github.com/johnbeard/kiplot)
 
 
 ## Installation
