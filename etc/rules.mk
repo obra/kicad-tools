@@ -13,7 +13,7 @@ SCHEMATIC_RELATIVE_PATH := $(PROJECT_PATH)/$(BOARD).sch
 
 # Output configuration
 
-BOARD_SNAPSHOT_LABEL := $(BOARD)-$(shell git describe)
+BOARD_SNAPSHOT_LABEL := $(BOARD)-$(shell git describe --all)
 OUTPUT_BASEDIR := out/$(BOARD_SNAPSHOT_LABEL)
 OUTPUT_PATH := $(PROJECT_ABS_PATH)/$(OUTPUT_BASEDIR)
 
