@@ -90,9 +90,10 @@ WARNING: DO NOT BLINDLY RUN THAT COMMAND IF YOU ALREADY HAVE A MAKEFILE.
 To enable automatic graphical diffs of PCB layouts, you need to teach git how to handle
 .kicad_pcb files
 
+```
 # echo "*.kicad_pcb diff=kicad_pcb" >> `git rev-parse --show-toplevel)`/.gitattributes
 # git config diff.kicad_pcb.command /opt/kicad-tools/bin/git-pcbdiff
-
+```
 
 
 ## Usage
