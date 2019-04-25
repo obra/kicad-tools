@@ -46,9 +46,10 @@ plot_board $RIGHT_SHA $RIGHT_DIR $RIGHT_INPUT
 # This recipe is from https://gist.github.com/brechtm/891de9f72516c1b2cbc1
 # It does not work at all for differently sized images
 
-#find $LEFT_DIR -name \*.png |xargs -n 1 basename -s .png | xargs -n 1 -P 0 -I % convert $LEFT_DIR/%.png $RIGHT_DIR/%.png '(' -clone 0-1 -compose darken -composite ')' -channel RGB -combine $DIFF_DIR/%-2.png
+find $LEFT_DIR -name \*.png |xargs -n 1 basename -s .png | xargs -n 1 -P 0 -I % convert '(' $LEFT_DIR/%.png -flatten -grayscale Rec709Luminance ')' '(' $RIGHT_DIR/%.png -flatten -grayscale Rec709Luminance ')' '(' -clone 0-1 -compose darken -composite ')'  -channel RGB -combine $DIFF_DIR/%.png
 
-find $LEFT_DIR -name \*.png |xargs -n 1 basename -s .png | xargs -n 1 -P 0 -I % composite -stereo 0 $LEFT_DIR/%.png $RIGHT_DIR/%.png $DIFF_DIR/%.png
+
+#find $LEFT_DIR -name \*.png |xargs -n 1 basename -s .png | xargs -n 1 -P 0 -I % composite -stereo 0 $LEFT_DIR/%.png $RIGHT_DIR/%.png $DIFF_DIR/%.png
 
 find $DIFF_DIR -name \*png |xargs -n 1 -P 0 -I % convert -trim % %
 DIFF_FILES=$(ls -a $DIFF_DIR/*.png)
