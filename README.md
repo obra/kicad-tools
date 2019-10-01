@@ -36,7 +36,7 @@ Before setting up this package, you should have both Docker and git installed on
 2. Build and deploy the local docker container.
 	```
 	cd /opt/kicad-tools
-  git submodule update --init
+  	git submodule update --init
 	make
 	```
 
