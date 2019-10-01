@@ -47,7 +47,7 @@ COPY upstream/kicad-automation-scripts /usr/lib/python2.7/dist-packages/kicad-au
 # Copy default configuration and fp_lib_table to prevent first run dialog
 COPY upstream/kicad-automation-scripts/config/* /root/.config/kicad/
 
-# Copy the installed global symbol and footprint so projcts built with stock
+# Copy the installed global symbol and footprint so projects built with stock
 # symbols and footprints don't break
 RUN cp /usr/share/kicad/template/sym-lib-table /root/.config/kicad/
 RUN cp /usr/share/kicad/template/fp-lib-table /root/.config/kicad/
@@ -85,7 +85,12 @@ COPY scripts/make-interactive-bom /opt/InteractiveHtmlBom/
 # Install image diffing
 RUN apt-get -y update && \
     apt-get install -y imagemagick && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    sed -i '/disable ghostscript format types/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"PS\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"EPS\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"PDF\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"XPS\"/d' /etc/ImageMagick-6/policy.xml
 
 COPY bin-on-docker/git-diff-boards.sh /opt/diff-boards/
 #COPY bin/git-imgdiff /opt/diff-boards/
