@@ -47,7 +47,7 @@ COPY upstream/kicad-automation-scripts /usr/lib/python2.7/dist-packages/kicad-au
 # Copy default configuration and fp_lib_table to prevent first run dialog
 COPY upstream/kicad-automation-scripts/config/* /root/.config/kicad/
 
-# Copy the installed global symbol and footprint so projcts built with stock
+# Copy the installed global symbol and footprint so projects built with stock
 # symbols and footprints don't break
 RUN cp /usr/share/kicad/template/sym-lib-table /root/.config/kicad/
 RUN cp /usr/share/kicad/template/fp-lib-table /root/.config/kicad/
