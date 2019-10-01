@@ -85,7 +85,12 @@ COPY scripts/make-interactive-bom /opt/InteractiveHtmlBom/
 # Install image diffing
 RUN apt-get -y update && \
     apt-get install -y imagemagick && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    sed -i '/disable ghostscript format types/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"PS\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"EPS\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"PDF\"/d' /etc/ImageMagick-6/policy.xml && \
+    sed -i '/\"XPS\"/d' /etc/ImageMagick-6/policy.xml
 
 COPY bin-on-docker/git-diff-boards.sh /opt/diff-boards/
 #COPY bin/git-imgdiff /opt/diff-boards/
