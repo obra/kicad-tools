@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+my $filename = shift;
+open(my $file, "<", $filename);
+my @lines = <$file>;
+
+print "Designator,Val,Package,Mid X,Mid Y,Rotation,Layer\n";
+
+my $content  = join("", @lines);
+my @sections = split(/\(module /, $content);
+
+shift @sections;
+foreach my $sec (@sections) {
+
+    if ($sec =~ /(?:.*?:)?(\S*)\s* 
+			(?:locked )?
+			\(layer \s* (.*?)\).*?
+			\(at \s* (-?[\d\.]+) \s* (-?[\d\.]+)\s?(\d*?)\)
+			.*?
+			(attr \s virtual)?
+			.*?
+			reference \s* (\S*)
+			.*?
+			value \s* (".*?"|\S*?) \s* \(/gsx
+       )
+    {
+        my $fp      = $1;
+        my $layer   = $2;
+        my $x       = $3 || 0;
+        my $y       = $4 || 0;
+        my $rot     = $5 || 0;
+        my $virtual = $6 || '';
+        my $ref     = $7;
+        my $val     = $8;
+
+        if ($virtual && $virtual eq 'virtual') {
+            next;
+        }
+
+        if ($sec !~ /smd/) {
+            next;
+        }
+
+        $y = 0 - $y;
+        if ($layer eq 'F.Cu') {
+            $layer = "top";
+        } else {
+            $layer = "bottom";
+        }
+
+        $x = sprintf '%f', $x;
+        $y = sprintf '%f', $y;
+        $val = '"' . $val . '"' unless ($val =~ /^"/);
+        $rot = sprintf '%f', $rot;
+        print join(",", '"' . $ref . '"', $val, '"' . $fp . '"', $x, $y, $rot, $layer) . "\n";
+
+    }
+}
+
