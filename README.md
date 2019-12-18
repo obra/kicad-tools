@@ -36,7 +36,7 @@ Before setting up this package, you should have both Docker and git installed on
 2. Build and deploy the local docker container.
 	```
 	cd /opt/kicad-tools
-  git submodule update --init
+	git submodule update --init
 	make
 	```
 
@@ -49,16 +49,11 @@ may require you to 'sudo' to run Docker. In that case
 Eventually, you should see something like 'Successfully built 6476202f4575'
 
 3. Add our 'bin' directory to your shell's path. Typically, you'd do that by adding the line
-`export PATH=/opt/kicad-tools/bin:$PATH`
+`export PATH=/opt/kicad-tools/bin:$PATH` to your `.bashrc` or its equivalent.
 
-to your `.bashrc` or its equivalent.
+If you needed to run `sudo make` before, you should also add the line ```export DOCKER_NEEDS_SUDO=1``` just below the PATH line.
 
-If you needed to run `sudo make` before, you should also add the line
-
-```export DOCKER_NEEDS_SUDO=1``` just below the PATH line.
-
-
-You will need to restart your shell before it picks up a change to 
+You will need to restart your shell before it picks up any changes to your `.bashrc` or equivalent. 
 
 If you'd prefer to be able to run Docker containers without `sudo`, 
 you can find instructions for that here: 
@@ -102,7 +97,7 @@ To enable automatic graphical diffs of PCB layouts, you need to teach git how to
 Generating diff-able PNGs of schematics and boards is a fairly slow operation. Because of that, we
 cache the generated files. By default, they're cached in /tmp. Each board and schematic is uniquely identified in the cache, so it's safe to share a cache across multiple projects.
 
-You may want to consider caching them directories that persist across reboots.
+You may want to consider persisting the cache across reboots.
 
 To configure the PCB image cache, set the environment variable `BOARD_CACHE_DIR`. For example, you could add this to your `.bashrc`
 
