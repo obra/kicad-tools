@@ -26,9 +26,9 @@ All of this is built on other projects:
 
 ### Prerequisites
 
-As of this writing, these tools target KiCad 5.1, running in a Docker container. While Docker does add a small amount of overhead, it helps compartmentalize the complexity of orchestratitng these tools and (most importantly) makes it possible to generate schematic output from `eeschema` by running KiCad on a known configuration of an Ubuntu machine with a headless virtual X server.
+As of this writing, these tools target KiCad 5.1, running in a Docker container. While Docker does add a small amount of overhead, it helps compartmentalize the complexity of orchestrating these tools and (most importantly) makes it possible to generate schematic output from `eeschema` by running KiCad on a known configuration of an Ubuntu machine with a headless virtual X server.
 
-Theoretically, Dockerization makes it possible to run these tools on Windows or MacOS, though that is as-yet untestd.
+Theoretically, Dockerization makes it possible to run these tools on Windows or MacOS, though that is as-yet untested.
 
 Before setting up this package, you should have both Docker and git installed on your workstation.
 
@@ -42,7 +42,7 @@ Before setting up this package, you should have both Docker and git installed on
 
 This will spin for a while, downloading Ubuntu, KiCad, and the various tools we use.
 
-If you get an erorr about being unable to connect to Docker, your Docker configuration
+If you get an error about being unable to connect to Docker, your Docker configuration
 may require you to 'sudo' to run Docker. In that case
 ```sudo make```
 
