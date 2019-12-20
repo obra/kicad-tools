@@ -97,3 +97,5 @@ COPY bin-on-docker/git-diff-boards.sh /opt/diff-boards/
 COPY bin-on-docker/plot_board.py /opt/diff-boards/
 COPY bin-on-docker/pcb-diff.sh /opt/diff-boards/
 COPY bin-on-docker/schematic-diff.sh /opt/diff-boards/
+
+COPY bin-on-docker/fill_zones.py /usr/local/bin/
