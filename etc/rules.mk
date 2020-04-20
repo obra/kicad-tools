@@ -19,7 +19,7 @@ OUTPUT_PATH := $(PROJECT_ABS_PATH)/$(OUTPUT_BASEDIR)
 
 
 export DOCKER_VOLUMES := --volume $(DOCKER_VISIBLE_PATH):/kicad-project: \
-   		  --volume $(OUTPUT_PATH):/output: 
+   		  --volume $(OUTPUT_PATH):/output:
 
 # Infrastructure config
 
@@ -30,20 +30,20 @@ DOCKER_RUN := $(TOOLS_HOME)/bin/kicad-docker-run
 
 
 
-all: 
+all:
 	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
 
 debug:
 	@echo "BOARD=$(BOARD)"
 	@echo "BOARD_SNAPSHOT_LABEL=$(BOARD_SNAPSHOT_LABEL)"
 	@echo "MAKEFILE_PATH=$(MAKEFILE_PATH)"
-	
+
 	@echo "DOCKER_VISIBLE_PATH=$(DOCKER_VISIBLE_PATH)"
 	@echo "PROJECT_PATH=$(PROJECT_PATH)"
 	@echo "PROJECT_ABS_PATH=$(PROJECT_ABS_PATH)"
 	@echo "OUTPUT_PATH=$(OUTPUT_PATH)"
 
-fabrication-outputs: dirs bom interactive-bom schematic gerbers archive
+fabrication-outputs: dirs bom interactive-bom schematic gerbers kicost archive
 	@echo "Done. You can find your outputs in "
 	@echo $(OUTPUT_PATH)
 
@@ -72,8 +72,11 @@ interactive-bom: dirs
 bom: dirs
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ export
 
+kicost: bom
+	$(DOCKER_RUN) kicost --input /kicad-project/$(PROJECT_PATH)/$(BOARD).xml --output=/output/kicost.xlsx --overwrite
+
 schematic-pdf: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf export --all_pages  -f pdf 
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf export --all_pages  -f pdf
 schematic-svg: dirs
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg export --all_pages  -f svg
 
