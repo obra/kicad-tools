@@ -1,25 +1,26 @@
 # Portions Copyright 2019 Productize SPRL
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# 
+#
 #
 # This docker configuration was originally based on https://github.com/productize/docker-kicad as of 301bf181b72c811e9644b83a895ec4a16f2fa1a0
 
 
-FROM ubuntu:disco
+FROM ubuntu:bionic
 MAINTAINER Jesse Vincent <jesse@keyboard.io>
 LABEL Description="Minimal KiCad image based on Ubuntu"
 
 
 ADD upstream/kicad-automation-scripts/kicad-ppa.pgp .
+
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
         apt-get -y update && \
         apt-get -y install gnupg2 && \
-        echo 'deb http://ppa.launchpad.net/js-reynaud/kicad-5.1/ubuntu disco main' >> /etc/apt/sources.list && \
+        echo 'deb http://ppa.launchpad.net/js-reynaud/kicad-5.1/ubuntu bionic main' >> /etc/apt/sources.list && \
         apt-key add kicad-ppa.pgp && \
         apt-get -y update && apt-get -y install --no-install-recommends kicad kicad-footprints kicad-symbols kicad-packages3d && \
         apt-get -y purge gnupg2 && \
@@ -63,7 +64,7 @@ RUN apt-get -y update && \
 
 COPY upstream/kiplot /opt/kiplot
 
-RUN cd /opt/kiplot && pip3 install -e . 
+RUN cd /opt/kiplot && pip3 install -e .
 
 COPY etc/kiplot /opt/etc/kiplot
 
