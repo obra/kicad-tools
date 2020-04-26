@@ -68,6 +68,12 @@ RUN cd /opt/kiplot && pip3 install -e .
 COPY etc/kiplot /opt/etc/kiplot
 
 
+# Install tracespace
+# https://github.com/tracespace/tracespace
+RUN apt-get -y update && apt-get install -y npm
+RUN npm install -g @tracespace/cli
+
+
 # Install KiCost
 #
 # Disabled because KiCost depends on Octopart which no longer has a free API
