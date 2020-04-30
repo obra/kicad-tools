@@ -68,11 +68,9 @@ schematic: schematic-svg schematic-pdf
 
 draw: draw-board draw-assembly
 draw-board: gerbers
-	$(DOCKER_RUN) tracespace -L --out=/output/layout/board /output/layout/gerber/*Edge_Cuts.gbr /output/layout/gerber/*.drl gerber/*Cu.gbr /output/layout/gerber/*Mask.gbr /output/layout/gerber/*Paste.gbr /output/layout/gerber/*SilkS.gbr
+	$(DOCKER_RUN) tracespace -L --out=/output/layout/board /output/layout/gerber/*Edge_Cuts.gbr /output/layout/gerber/*.drl /output/layout/gerber/*Mask.gbr /output/layout/gerber/*SilkS.gbr /output/layout/gerber/*Cu.gbr
 draw-assembly: gerbers
 	$(DOCKER_RUN) tracespace -B --out=/output/layout/assembly /output/layout/gerber/*Fab.gbr
-#draw-docs: gerbers
-#	$(DOCKER_RUN) tracespace -L --out=/output/layout/docs /output/layout/gerber/*Edge_Cuts.gbr /output/layout/gerber/*.drl gerber/*User.gbr
 
 interactive-bom: dirs
 	$(DOCKER_RUN) sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD_RELATIVE_PATH)

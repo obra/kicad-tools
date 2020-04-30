@@ -153,6 +153,11 @@ To generate an HTML interactive BOM
 $ make interactive-bom
 ```
 
+To generate SVG graphics with board layout and assembly
+```
+$ make draw
+```
+
 If you need to log into the docker instance to debug something, there's a makefile target for that, too
 
 ```
