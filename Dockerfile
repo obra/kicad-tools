@@ -13,7 +13,7 @@
 FROM ubuntu:bionic
 MAINTAINER Jesse Vincent <jesse@keyboard.io>
 LABEL Description="Minimal KiCad image based on Ubuntu"
-
+LABEL org.opencontainers.image.source https://github.com/obra/kicad-tools
 
 ADD upstream/kicad-automation-scripts/kicad-ppa.pgp .
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
