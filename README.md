@@ -28,7 +28,7 @@ All of this is built on other projects:
 
 As of this writing, these tools target KiCad 5.1, running in a Docker container. While Docker does add a small amount of overhead, it helps compartmentalize the complexity of orchestrating these tools and (most importantly) makes it possible to generate schematic output from `eeschema` by running KiCad on a known configuration of an Ubuntu machine with a headless virtual X server.
 
-Theoretically, Dockerization makes it possible to run these tools on Windows or MacOS, though that is as-yet untested.
+Dockerization makes it possible to run these tools consistently on different platforms; macOS and Linux have been tested, Windows should also work though that is as-yet untested.
 
 Before setting up this package, you should have both Docker and git installed on your workstation.
 
@@ -40,7 +40,13 @@ Before setting up this package, you should have both Docker and git installed on
 	make
 	```
 
-This will spin for a while, downloading Ubuntu, KiCad, and the various tools we use.
+This will spin for a while, downloading Ubuntu, KiCad, and the various tools we use. 
+
+Alternatively, you can use the pre-built image from Github Container Registry:
+
+    ```
+    docker image tag ghcr.io/obra/kicad-tools:latest kicad-automation
+    ```
 
 If you get an error about being unable to connect to Docker, your Docker configuration
 may require you to 'sudo' to run Docker. In that case
@@ -58,6 +64,11 @@ You will need to restart your shell before it picks up any changes to your `.bas
 If you'd prefer to be able to run Docker containers without `sudo`, 
 you can find instructions for that here: 
 https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user
+
+4. On macOS, install 'realpath' using:
+    ```
+    brew install coreutils
+    ```
 
 
 You can verify that everything you've done so far is working by typing 
