@@ -28,6 +28,12 @@ DOCKER_RUN := $(TOOLS_HOME)/bin/kicad-docker-run
 
 
 
+# screencast option to help debug
+ifeq ($(DO_SCREENCAST), 1)
+	SCREENCAST_OPT=--screencast_dir /output
+else
+	SCREENCAST_OPT=
+endif
 
 
 all: 
@@ -70,12 +76,12 @@ interactive-bom: dirs
 	$(DOCKER_RUN) sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD_RELATIVE_PATH)
 
 bom: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ export
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ $(SCREENCAST_OPT) export
 
 schematic-pdf: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf export --all_pages  -f pdf 
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf $(SCREENCAST_OPT) export --all_pages  -f pdf 
 schematic-svg: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg export --all_pages  -f svg
+	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg $(SCREENCAST_OPT) export --all_pages  -f svg
 
 docker-shell:
 	$(DOCKER_RUN) bash
