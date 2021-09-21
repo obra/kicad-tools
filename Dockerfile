@@ -29,7 +29,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 COPY upstream/kicad-automation-scripts/eeschema/requirements.txt .
 RUN apt-get -y update && \
-    apt-get install -y python python-pip xvfb recordmydesktop xdotool xclip && \
+    apt-get install -y python python-pip xvfb recordmydesktop xdotool xclip zip && \
     pip install -r requirements.txt && \
     rm requirements.txt
 
@@ -67,6 +67,12 @@ RUN cd /opt/kiplot && pip3 install -e .
 
 COPY etc/kiplot /opt/etc/kiplot
 
+# Install JLCKicadTools
+
+# this tool requires python3
+
+COPY upstream/JLCKicadTools /opt/jlckicadtools
+RUN cd /opt/jlckicadtools && pip3 install -e .
 
 # Install KiCost
 #
