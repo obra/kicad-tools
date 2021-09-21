@@ -198,3 +198,16 @@ To compare the version of my_board.sch in `master` to the version as of tag `rev
 ```
 $ git schematic-diff master rev1 my_board.sch
 ```
+
+### Capturing a Screencast of Schematic and BOM Operations
+
+For the `bom`, `schematic-pdf`, and `schematic-svg` targets, it is possible to
+generate a screencast of the GUI operations performed in the docker container.
+This may be helpful to debug problems with the expected output.
+
+To enable this, add `DO_SCREENCAST=1` to your make command line, like this:
+
+    make bom DO_SCREENCAST=1
+
+You will end up with a `.ogv.` file in the output directory. You can view the
+screencast with VLC or other tool that can decode `.ogv` files.
