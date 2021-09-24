@@ -7,3 +7,6 @@
 [submodule "upstream/kiplot"]
 	path = upstream/kiplot
 	url = https://github.com/johnbeard/kiplot
+[submodule "upstream/JLCKicadTools"]
+	path = upstream/JLCKicadTools
+	url = https://github.com/matthewlai/JLCKicadTools.git
