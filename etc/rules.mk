@@ -76,6 +76,7 @@ interactive-bom: dirs
 	$(DOCKER_RUN) sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD_RELATIVE_PATH)
 
 bom: dirs
+	rm -f "$(OUTPUT_PATH)/bom/bom.csv"
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ $(SCREENCAST_OPT) export
 
 schematic-pdf: dirs
