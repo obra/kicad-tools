@@ -38,6 +38,35 @@ endif
 all: 
 	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
 
+.PHONY: help
+help:
+	@echo ""
+	@echo "General production files"
+	@echo "------------------------"
+	@echo "make fabrication-outputs    - generate bom, schematics, gerbers"
+	@echo "make clean                  - remove all output artifacts"
+	@echo ""
+	@echo "Generate specific production artifacts"
+	@echo "--------------------------------------"
+	@echo "make gerbers"
+	@echo "make schematic-svg          - schematic in SVG format"
+	@echo "make schematic-pdf          - schematic in PDF format"
+	@echo "make schematic              - both formats"
+	@echo "make bom                    - generate bom.csv file"
+	@echo "make interactive-bom        - browser viewable BOM"
+	@echo ""
+	@echo "JLCPCB production files"
+	@echo "-----------------------"
+	@echo "make fabrication-outputs-jlcpcb - all required files for JLCPCB"
+	@echo "make gerbers-jlcpcb             - zipped gerbers"
+	@echo "make bom-jlcpcb                 - parts and placement files"
+	@echo "make clean-jlcpcb               - remove jlcpcb artifacts"
+	@echo ""
+	@echo "Debugging"
+	@echo "---------"
+	@echo "make debug                  - print Makefile variables"
+	@echo "make docker-shell           - shell into container"
+
 debug:
 	@echo "BOARD=$(BOARD)"
 	@echo "BOARD_SNAPSHOT_LABEL=$(BOARD_SNAPSHOT_LABEL)"
