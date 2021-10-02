@@ -199,6 +199,51 @@ To compare the version of my_board.sch in `master` to the version as of tag `rev
 $ git schematic-diff master rev1 my_board.sch
 ```
 
+### Generate Production Files for JLCPCB
+
+You can generate zipped gerbers and BOM placement files that can be used
+directly with JLCPCB for board assembly. Use the JLCPCB-specific target, like
+this:
+
+    make fabrication-outputs-jlcpcb
+
+This will create a directory under `out/jlcpcb` that contains a zip file of
+the gerbers, the BOM parts file, and the parts placement file. These are the
+files you will upload to JLCPCB for board fabrication and assembly.
+
+This feature makes use of the scripts from
+[JLCKicadTools](https://github.com/matthewlai/JLCKicadTools). For details about
+how to use it, see
+[the blog post](https://dubiouscreations.com/2019/10/21/using-kicad-with-jlcpcb-assembly-service)
+referenced from that repo README.
+
+You will need to do some preparations in advance. You need to see the blog
+post, but the short version is:
+
+1. Select your parts from the [JLCPCB Parts Library](https://jlcpcb.com/parts)
+2. In your schematic, add a field containing the LCSC part number (begins with
+   "C"). I suggest naming the field something like "LCSCStockCode" but the
+   specific name is not important). Do this for every component you want to be
+   assembled by JLCPCB.
+3. Create a subdirectory in your project directory, named `jlcpcb`. In that
+   directory place a file named `cpl_rotations_db.csv`. You can find a template
+   for this file from
+   [here](https://github.com/matthewlai/JLCKicadTools/blob/master/jlc_kicad_tools/cpl_rotations_db.csv)
+4. **Required Manual Step** - Open pcbnew and generate a footprint position
+   file:
+
+    * *File->Fabrication Outputs->Footprint Position File*
+    * CSV Format, units mm, "single file for board"
+    * (In the future this step should be automated)
+
+5. You can make edits in the rotations file if your parts are not placed with
+   the correct orientation when you upload to JLCPCB. You can find more
+   information about this from the blog post mentioned above. Unfortunately,
+   the parts orientation process is a little bit trial and error. You need to
+   upload the files to JLCPCB and look at the rendered component placements and
+   make sure they are correct. Then make corrections using the rotations file
+   and try again.
+
 ### Capturing a Screencast of Schematic and BOM Operations
 
 For the `bom`, `schematic-pdf`, and `schematic-svg` targets, it is possible to
