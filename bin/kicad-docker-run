@@ -1,3 +1,4 @@
+#!/bin/bash
 # Docker config
 if [ "x$DOCKER_NEEDS_SUDO" != "x" ]; then
 	DOCKER_SUDO=sudo
@@ -12,6 +13,5 @@ DOCKER_RUN=${DOCKER_SUDO} ${DOCKER_CMD_PATH} \
 	--interactive --tty \
 	${DOCKER_VOLUMES} \
 	${DOCKER_CONTAINER} \
-	$@
-
+	"$@"
 exec $DOCKER_RUN

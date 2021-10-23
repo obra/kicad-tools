@@ -1,7 +1,19 @@
 # Project-specific config
+# 
+
+# Detect OS/setup https://stackoverflow.com/questions/714100/os-detecting-makefile/52062069#52062069
+ifeq '$(findstring ;,$(PATH))' ';'
+    detected_OS := Windows
+else
+    detected_OS := $(shell uname 2>/dev/null || echo Unknown)
+    detected_OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
+    detected_OS := $(patsubst MSYS%,MSYS,$(detected_OS))
+    detected_OS := $(patsubst MINGW%,MSYS,$(detected_OS))
+endif
 
 MAKEFILE_PATH := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 DOCKER_VISIBLE_PATH := $(abspath $(MAKEFILE_PATH)/..)
+
 
 # We should be using realpath(1) here)
 PROJECT_PATH := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
@@ -16,6 +28,10 @@ BOARD_SNAPSHOT_LABEL := $(BOARD)-$(shell git describe --all)
 OUTPUT_BASEDIR := out/$(BOARD_SNAPSHOT_LABEL)
 OUTPUT_PATH := $(PROJECT_ABS_PATH)/$(OUTPUT_BASEDIR)
 
+ifeq ($(detected_OS),Cygwin)
+  DOCKER_VISIBLE_PATH := $(shell cygpath -w $(DOCKER_VISIBLE_PATH))
+  OUTPUT_PATH := $(shell cygpath -w $(OUTPUT_PATH))
+endif
 
 export DOCKER_VOLUMES := --volume $(DOCKER_VISIBLE_PATH):/kicad-project: \
    		  --volume $(OUTPUT_PATH):/output: 
@@ -68,6 +84,7 @@ help:
 	@echo "make docker-shell           - shell into container"
 
 debug:
+	@echo "detected_OS=$(detected_OS)"
 	@echo "BOARD=$(BOARD)"
 	@echo "BOARD_SNAPSHOT_LABEL=$(BOARD_SNAPSHOT_LABEL)"
 	@echo "MAKEFILE_PATH=$(MAKEFILE_PATH)"
