@@ -51,9 +51,6 @@ else
 endif
 
 
-all: 
-	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
-
 .PHONY: help
 help:
 	@echo ""
@@ -83,6 +80,12 @@ help:
 	@echo "make debug                  - print Makefile variables"
 	@echo "make docker-shell           - shell into container"
 
+.PHONY: all
+all: 
+	@echo "This project does not have an 'all' target. You probably want 'fabrication-outputs'"
+
+
+.PHONY: debug
 debug:
 	@echo "detected_OS=$(detected_OS)"
 	@echo "BOARD=$(BOARD)"
@@ -94,29 +97,34 @@ debug:
 	@echo "PROJECT_ABS_PATH=$(PROJECT_ABS_PATH)"
 	@echo "OUTPUT_PATH=$(OUTPUT_PATH)"
 
+.PHONY: fabrication-outputs
 fabrication-outputs: dirs bom interactive-bom schematic gerbers archive
 	@echo "Done. You can find your outputs in "
 	@echo $(OUTPUT_PATH)
 
 
 
+.PHONY: archive
 archive:
 	cd out && zip -r $(BOARD_SNAPSHOT_LABEL).zip $(BOARD_SNAPSHOT_LABEL)
 
 
+.PHONY: gerbers
 gerbers: dirs
 	$(DOCKER_RUN) kiplot -b /kicad-project/$(BOARD_RELATIVE_PATH)  -c /opt/etc/kiplot/generic_plot.kiplot.yaml -v -d /output/
 
+.PHONY: dirs
 dirs:
 	mkdir -p $(OUTPUT_PATH)
 	mkdir -p $(OUTPUT_PATH)/layout
 	mkdir -p $(OUTPUT_PATH)/bom/interactive
 	mkdir -p $(OUTPUT_PATH)/schematic
 
+.PHONY: schematic
 schematic: schematic-svg schematic-pdf
 
 
-
+.PHONY: interactive-bom
 interactive-bom: dirs
 	$(DOCKER_RUN) sh /opt/InteractiveHtmlBom/make-interactive-bom /kicad-project/$(BOARD_RELATIVE_PATH)
 
@@ -125,8 +133,11 @@ bom: dirs
 	rm -f "$(OUTPUT_PATH)/bom/bom.csv"
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ $(SCREENCAST_OPT) export
 
+.PHONY: schematic-pdf
 schematic-pdf: dirs
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf $(SCREENCAST_OPT) export --all_pages  -f pdf 
+
+.PHONY: schematic-svg
 schematic-svg: dirs
 	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg $(SCREENCAST_OPT) export --all_pages  -f svg
 
