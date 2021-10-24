@@ -70,6 +70,8 @@ COPY upstream/kiplot /opt/kiplot
 RUN cd /opt/kiplot && pip3 install -e . 
 
 COPY etc/kiplot /opt/etc/kiplot
+RUN perl -i -p -e 's@yaml.load\(@yaml.safe_load(@;' /opt/kiplot/src/kiplot/config_reader.py
+
 
 # Install JLCKicadTools
 
