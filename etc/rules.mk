@@ -1,6 +1,6 @@
 # Project-specific config
 # 
-
+PYTHON=python2.7
 # Detect OS/setup https://stackoverflow.com/questions/714100/os-detecting-makefile/52062069#52062069
 ifeq '$(findstring ;,$(PATH))' ';'
     detected_OS := Windows
@@ -131,15 +131,15 @@ interactive-bom: dirs
 .PHONY: bom
 bom: dirs
 	rm -f "$(OUTPUT_PATH)/bom/bom.csv"
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ $(SCREENCAST_OPT) export
+	$(DOCKER_RUN) $(PYTHON) -m kicad-automation.eeschema.export_bom --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH)  --output_dir /output/bom/ $(SCREENCAST_OPT) export
 
 .PHONY: schematic-pdf
 schematic-pdf: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf $(SCREENCAST_OPT) export --all_pages  -f pdf 
+	$(DOCKER_RUN) $(PYTHON) -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/pdf $(SCREENCAST_OPT) export --all_pages  -f pdf 
 
 .PHONY: schematic-svg
 schematic-svg: dirs
-	$(DOCKER_RUN) python -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg $(SCREENCAST_OPT) export --all_pages  -f svg
+	$(DOCKER_RUN) $(PYTHON) -m kicad-automation.eeschema.schematic --schematic /kicad-project/$(SCHEMATIC_RELATIVE_PATH) --output_dir /output/schematic/svg $(SCREENCAST_OPT) export --all_pages  -f svg
 
 .PHONY: docker-shell
 docker-shell:
