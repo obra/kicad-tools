@@ -10,7 +10,7 @@
 # This docker configuration was originally based on https://github.com/productize/docker-kicad as of 301bf181b72c811e9644b83a895ec4a16f2fa1a0
 
 
-FROM ubuntu:bionic
+FROM ubuntu:focal
 MAINTAINER Jesse Vincent <jesse@keyboard.io>
 LABEL Description="Minimal KiCad image based on Ubuntu"
 LABEL org.opencontainers.image.source https://github.com/obra/kicad-tools
@@ -18,8 +18,8 @@ LABEL org.opencontainers.image.source https://github.com/obra/kicad-tools
 ADD upstream/kicad-automation-scripts/kicad-ppa.pgp .
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
         apt-get -y update && \
-        apt-get -y install gnupg2 && \
-        echo 'deb http://ppa.launchpad.net/js-reynaud/kicad-5.1/ubuntu bionic main' >> /etc/apt/sources.list && \
+        apt-get -y install gnupg2 software-properties-common && \
+        add-apt-repository ppa:kicad/kicad-5.1-releases && \
         apt-key add kicad-ppa.pgp && \
         apt-get -y update && apt-get -y install --no-install-recommends kicad kicad-footprints kicad-symbols kicad-packages3d && \
         apt-get -y purge gnupg2 && \
@@ -29,11 +29,15 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 COPY upstream/kicad-automation-scripts/eeschema/requirements.txt .
 RUN apt-get -y update && \
-    apt-get install -y python python-pip xvfb recordmydesktop xdotool xclip zip && \
-    pip install -r requirements.txt && \
+    apt-get install -y python2 xvfb recordmydesktop xdotool xclip zip curl && \
+    apt-get install -y gcc build-essential && \
+    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py && \
+    python2 get-pip.py && rm get-pip.py && \
+    apt-get install -y python2-dev && \
+    pip2 install -r requirements.txt && \
     rm requirements.txt
 
-RUN apt-get -y remove python3-pip && \
+RUN apt-get -y remove python3-pip build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 
