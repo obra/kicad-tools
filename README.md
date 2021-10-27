@@ -2,7 +2,7 @@
 
 ## What's in the package 
 
-This project packages up a number of productivity-enhancing tools for KiCad (https://kicad-pcb.org), primarily
+This project packages up a number of productivity-enhancing tools for KiCad (https://kicad.org), primarily
 focused on automating generation of fabrication outputs and commandline productivity for projects tracked in git.
 
 ### Fabrication outputs
