@@ -10,3 +10,6 @@
 [submodule "upstream/JLCKicadTools"]
 	path = upstream/JLCKicadTools
 	url = https://github.com/matthewlai/JLCKicadTools.git
+[submodule "upstream/KiAuto"]
+	path = upstream/KiAuto
+	url = https://github.com/INTI-CMNB/KiAuto
