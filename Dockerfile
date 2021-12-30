@@ -15,30 +15,15 @@ MAINTAINER Jesse Vincent <jesse@keyboard.io>
 LABEL Description="Minimal KiCad image based on Ubuntu"
 LABEL org.opencontainers.image.source https://github.com/obra/kicad-tools
 
-ADD upstream/kicad-automation-scripts/kicad-ppa.pgp .
+ADD etc/kicad-ppa.pgp .
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
         apt-get -y update && \
         apt-get -y install gnupg2 software-properties-common && \
-        add-apt-repository ppa:kicad/kicad-5.1-releases && \
+        add-apt-repository ppa:kicad/kicad-6.0-releases && \
         apt-key add kicad-ppa.pgp && \
-        apt-get -y update && apt-get -y install --no-install-recommends kicad kicad-footprints kicad-symbols kicad-packages3d && \
-        apt-get -y purge gnupg2 && \
-        apt-get -y autoremove && \
-        rm -rf /var/lib/apt/lists/* && \
+        apt-get -y update && \
+	apt-get -y install --no-install-recommends kicad kicad-footprints kicad-symbols kicad-packages3d && \
         rm kicad-ppa.pgp
-
-COPY upstream/kicad-automation-scripts/eeschema/requirements.txt .
-RUN apt-get -y update && \
-    apt-get install -y python2 xvfb recordmydesktop xdotool xclip zip curl && \
-    apt-get install -y gcc build-essential && \
-    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py && \
-    python2 get-pip.py && rm get-pip.py && \
-    apt-get install -y python2-dev && \
-    pip2 install -r requirements.txt && \
-    rm requirements.txt
-
-RUN apt-get -y remove python3-pip build-essential && \
-    rm -rf /var/lib/apt/lists/*
 
 
 # Use a UTF-8 compatible LANG because KiCad 5 uses UTF-8 in the PCBNew title
@@ -46,48 +31,26 @@ RUN apt-get -y remove python3-pip build-essential && \
 # attempting to look for the window name with xdotool.
 ENV LANG C.UTF-8
 
-COPY upstream/kicad-automation-scripts /usr/lib/python2.7/dist-packages/kicad-automation
+COPY upstream/KiAuto /opt/kiauto
 
-# Copy default configuration and fp_lib_table to prevent first run dialog
-COPY upstream/kicad-automation-scripts/config/* /root/.config/kicad/
+RUN apt-get install -y python3 xvfb recordmydesktop xdotool xclip zip curl x11vnc gcc build-essential \
+	python3-dev python3-pip python3-distutils python3-yaml python3-xlsxwriter
 
-# Copy the installed global symbol and footprint so projects built with stock
-# symbols and footprints don't break
-RUN cp /usr/share/kicad/template/sym-lib-table /root/.config/kicad/
-RUN cp /usr/share/kicad/template/fp-lib-table /root/.config/kicad/
+RUN cd /opt/kiauto/ && pip3 install -e .
 
 
+
+RUN useradd -ms /bin/bash user
 
 # Install KiPlot
+COPY upstream/KiBot /opt/kibot
 
-# Kicad's libraries are tied to python3, so we need to install kiplot with
-# python 3
-RUN apt-get -y update && \
-    apt-get install -y python3-pip
-
-COPY upstream/kiplot /opt/kiplot
-
-RUN cd /opt/kiplot && pip3 install -e . 
-
-COPY etc/kiplot /opt/etc/kiplot
-RUN perl -i -p -e 's@yaml.load\(@yaml.safe_load(@;' /opt/kiplot/src/kiplot/config_reader.py
-
+RUN cd /opt/kibot && pip install --no-compile .
 
 # Install JLCKicadTools
 
-# this tool requires python3
-
 COPY upstream/JLCKicadTools /opt/jlckicadtools
 RUN cd /opt/jlckicadtools && pip3 install -e .
-
-# Install KiCost
-#
-# Disabled because KiCost depends on Octopart which no longer has a free API
-#RUN pip3 install 'kicost==1.0.4'
-#
-#RUN apt-get -y remove python3-pip && \
-#    rm -rf /var/lib/apt/lists/*
-#
 
 # Install the interactive BOM
 
@@ -104,6 +67,14 @@ RUN apt-get -y update && \
     sed -i '/\"PDF\"/d' /etc/ImageMagick-6/policy.xml && \
     sed -i '/\"XPS\"/d' /etc/ImageMagick-6/policy.xml
 
+
+RUN apt-get -y purge gnupg2 python3-pip build-essential && \
+    apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+
+
+
 COPY bin-on-docker/git-diff-boards.sh /opt/diff-boards/
 #COPY bin/git-imgdiff /opt/diff-boards/
 COPY bin-on-docker/plot_board.py /opt/diff-boards/
@@ -111,3 +82,8 @@ COPY bin-on-docker/pcb-diff.sh /opt/diff-boards/
 COPY bin-on-docker/schematic-diff.sh /opt/diff-boards/
 
 COPY bin-on-docker/fill_zones.py /usr/local/bin/
+
+
+USER user
+WORKDIR /home/user
+

@@ -1,6 +1,6 @@
 [submodule "upstream/InteractiveHtmlBom"]
 	path = upstream/InteractiveHtmlBom
-	url = https://github.com/openscopeproject/InteractiveHtmlBom
+	url = https://github.com/INTI-CMNB/InteractiveHtmlBom
 [submodule "upstream/kicad-automation-scripts"]
 	path = upstream/kicad-automation-scripts
 	url = https://github.com/obra/kicad-automation-scripts
@@ -16,3 +16,6 @@
 [submodule "upstream/KiBot"]
 	path = upstream/KiBot
 	url = https://github.com/INTI-CMNB/KiBot
+[submodule "upstream/PcbDraw"]
+	path = upstream/PcbDraw
+	url = https://github.com/INTI-CMNB/PcbDraw

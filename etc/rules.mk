@@ -20,7 +20,7 @@ PROJECT_PATH := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
 PROJECT_ABS_PATH := $(DOCKER_VISIBLE_PATH)/$(PROJECT_PATH)
 
 BOARD_RELATIVE_PATH := $(PROJECT_PATH)/$(BOARD).kicad_pcb
-SCHEMATIC_RELATIVE_PATH := $(PROJECT_PATH)/$(BOARD).sch
+SCHEMATIC_RELATIVE_PATH := $(PROJECT_PATH)/$(BOARD).kicad_sch
 
 # Output configuration
 
@@ -102,6 +102,10 @@ fabrication-outputs: dirs bom interactive-bom schematic gerbers archive
 	@echo "Done. You can find your outputs in "
 	@echo $(OUTPUT_PATH)
 
+.PHONY: kibot
+kibot: 
+	$(DOCKER_RUN) kibot -vvv  -b /kicad-project/$(BOARD_RELATIVE_PATH)  -c /kicad-project/$(PROJECT_PATH)/config.kibot.yaml -d /output/ -e  /kicad-project/$(SCHEMATIC_RELATIVE_PATH)
+ 
 
 
 .PHONY: archive
