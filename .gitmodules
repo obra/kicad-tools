@@ -13,3 +13,6 @@
 [submodule "upstream/KiAuto"]
 	path = upstream/KiAuto
 	url = https://github.com/INTI-CMNB/KiAuto
+[submodule "upstream/KiBot"]
+	path = upstream/KiBot
+	url = https://github.com/INTI-CMNB/KiBot
